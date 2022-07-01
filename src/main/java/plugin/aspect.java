@@ -24,9 +24,9 @@ public class aspect implements interpreter{
     public boolean checConstruct(Element node) {
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
-                file = child.getAttributeValue("path");
+                this.file = child.getAttributeValue("path");
             } else if (Objects.equals(child.getName(), "class")) {
-                className = child.getAttributeValue("name");
+                this.className = child.getAttributeValue("name");
             }
         }
         this.node = node;
@@ -69,6 +69,7 @@ public class aspect implements interpreter{
     @Override
     public void insert() {
         if(lib.JavaFileManager.getInstance().isFileInProjectDirectory(file)){
+            boolean test = lib.JavaFileManager.getInstance().deleteFile(file);
             System.out.println("present");
         }else{
             new importer(node).loadFile(this.importer.get("uri"), this.file);

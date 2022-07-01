@@ -43,7 +43,7 @@ public class main_engine {
                 for (Attribute attr: attrList) {
                     if(!attr.getValue().equals("")){
                         importer.putIfAbsent(attr.getName(), attr.getValue());
-                        new importer(node).load();
+                        //new importer(node).load();
                     }
                 }
             }

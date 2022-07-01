@@ -23,6 +23,9 @@ public class importer {
         this.copy(this.path, this.directory);
     }
     public void loadFile(String path, String relativePath){
+        if(!relativePath.startsWith("\\") && !path.endsWith("\\")){
+            relativePath = "\\"+relativePath;
+        }
         this.copy(path+relativePath,this.directory+relativePath);
     }
     public void copy(String path, String destination){
