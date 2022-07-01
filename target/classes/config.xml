@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <import uri="C:\unamur\Master\memoire\testSpring"/>
+    <CompCond url="">
+        <file path="" />
+        <cond line="">
+            <value variable="" />
+        </cond>
+    </CompCond>
+    <Plugin url="">
+        <file path="" />
+    </Plugin>
+    <Heritage url="">
+        <file path="" />
+        <class name="" />
+    </Heritage>
+    <SpringAspect url="">
+        <file path="\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
+        <class name="dbManagerAspect" />
+    </SpringAspect>
+</Configuration>

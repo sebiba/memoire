@@ -1,0 +1,8 @@
+plugin\heritage.class
+lib\xmlParser.class
+exceptions\StructureNotSupportedException.class
+lib\compileManager.class
+main_engine.class
+plugin\aspect.class
+Interfaces\interpreter.class
+META-INF\services\Interfaces.interpreter
