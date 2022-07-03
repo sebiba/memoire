@@ -28,6 +28,17 @@ public class main_engine {
                 break;
         }
     }
+    public static Map<String, String> importateur(Element node){
+        Map<String, String> importer = new HashMap<>();
+        List<Attribute> attrList = node.getAttributes();
+        for (Attribute attr: attrList) {
+            if(!attr.getValue().equals("")){
+                importer.putIfAbsent(attr.getName(), attr.getValue());
+                new importer(node).load();
+            }
+        }
+        return importer;
+    }
 
     /**
      * build de desired configuration corresponding to the xml file
@@ -35,17 +46,12 @@ public class main_engine {
      */
     public static void buildConfig(Element racine){
         Map<String, interpreter> plugins = loadPlugins();
-        Map<String, String> importer = new HashMap<>();
+
         for (Element node: xmlParser.getInstance().getChildOf(racine)) {
             //load import attr in map to pass to each variant
+            Map<String, String> importer = new HashMap<>();
             if(node.getName().equals("import")){
-                List<Attribute> attrList = node.getAttributes();
-                for (Attribute attr: attrList) {
-                    if(!attr.getValue().equals("")){
-                        importer.putIfAbsent(attr.getName(), attr.getValue());
-                        //new importer(node).load();
-                    }
-                }
+                importer.putAll(importateur(node));
             }
             //apply every plugin to corresponding variant
             try {
@@ -55,6 +61,7 @@ public class main_engine {
                 plugins.get(node.getName()).insert();
             }catch (Exception ignored){}
         }
+        //TODO: make preprocessor juste befor compile
         //compileManager.getInstance().maven_exec("C:\\unamur\\Master\\memoire\\engine2\\temp", "compile");
     }
     public static void checFeatureModel(Element racine){

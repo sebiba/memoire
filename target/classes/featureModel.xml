@@ -14,7 +14,7 @@
         <class name="" />
     </Heritage>
     <SpringAspect url="">
-        <file path="C:\unamur\Master\memoire\engine2\temp\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
+        <file path="\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
         <class name="dbManagerAspect" />
     </SpringAspect>
 </FeatureModel>

@@ -12,6 +12,8 @@ public class importer {
     private String path=null;
     private Boolean isUri=true;
     private final String directory = "temp";
+
+    public importer(){}
     public importer(Element node) {
         List<Attribute> attr = node.getAttributes();
         if(attr.size()>0){
