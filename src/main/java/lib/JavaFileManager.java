@@ -1,6 +1,9 @@
 package lib;
 
 import org.apache.commons.io.FileUtils;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -36,61 +39,6 @@ public class JavaFileManager {
         return delete.delete();
     }
 
-    public Map<Integer, String> lineWithConstruct(String file, String reg) throws IOException, TypeNotPresentException{
-        Map<Integer, String> lineNbr= new TreeMap<>();
-        List<String> lines = this.getFileContentAsLines(file);
-        for (int i = 0; i < lines.size(); i++) {
-            if(lines.get(i).contains(reg)){
-                lineNbr.put(i, lines.get(i));
-            }
-        }
-        if(lineNbr.size()==0){
-            throw new TypeNotPresentException("the file: "+file+", contain no preprocessor directories", null);
-        }
-        return lineNbr;
-    }
-
-    /**
-     * remove lines between start and end limit included from a file
-     * @param start first line to remove
-     * @param end last line to remove
-     * @param path path to the file to process
-     */
-    public void removeLines(int start, int end, String path) {
-        //TODO:remove lines from the file
-        List<String> lines = this.getFileContentAsLines(path);
-        try {
-            FileWriter writer = new FileWriter(tempPath+path);
-            for (int i = 0; i < lines.size(); i++) {
-                if(i<start || end<i){
-                    writer.write(lines.get(i) + System.lineSeparator());
-                }
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    /**
-     * remove one line from a file
-     * @param lineNbr  line to remove
-     * @param path path to the file to process
-     */
-    public void removeOneLine(int lineNbr, String path){
-        List<String> lines = this.getFileContentAsLines(path);
-        try {
-            FileWriter writer = new FileWriter(tempPath+path);
-            for (int i = 0; i < lines.size(); i++) {
-                if(i != lineNbr){
-                    writer.write(lines.get(i) + System.lineSeparator());
-                }
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
      * get file content in list of lines
      * @param path String path to file to read
@@ -115,5 +63,46 @@ public class JavaFileManager {
             e.printStackTrace();
         }
         return lines;
+    }
+
+    public void saveListInFile(String path, List<String> lines){
+        try {
+            FileWriter writer = new FileWriter(tempPath+path);
+            for (String line : lines) {
+                writer.write(line + System.lineSeparator());
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void copyFileFrom(String path, String destination){
+        File srcDir = new File(path);
+        File destDir = new File(destination);
+        try {
+            FileUtils.copyDirectory(srcDir, destDir);
+        } catch (IOException e) {
+            try {
+                if(srcDir.isFile() && destDir.isDirectory()) {
+                    FileUtils.copyFile(srcDir, new File(destDir + "\\" + srcDir.getName()));
+                }else{
+                    FileUtils.copyFile(srcDir, destDir);
+                }
+            } catch (IOException x) {
+                x.printStackTrace();
+            }
+        }
+    }
+
+    public Document getXmlFile(String path){
+        SAXBuilder sxb = new SAXBuilder();
+        Document document = null;
+        try {
+            document = sxb.build(new File(path));
+        } catch (JDOMException | IOException e) {
+            e.printStackTrace();
+        }
+        return document;
     }
 }

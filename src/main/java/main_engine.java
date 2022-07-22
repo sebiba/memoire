@@ -1,22 +1,18 @@
 import Interfaces.interpreter;
+import lib.Importer;
+import lib.JavaFileManager;
+import lib.compileManager;
 import lib.xmlParser;
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
-import plugin.importer;
 
-import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 public class main_engine {
     public static void main(String[] args) {
-        SAXBuilder sxb = new SAXBuilder();
-        Document document = null;
-        try {
-            document = sxb.build(new File("src/main/resources/config.xml"));
-        }
-        catch(Exception ignored){}
+        Document document = JavaFileManager.getInstance().getXmlFile("src/main/resources/config.xml");
         assert document != null;
         Element racine = document.getRootElement();
         switch (racine.getName()){
@@ -27,17 +23,7 @@ public class main_engine {
                 checFeatureModel(racine);
                 break;
         }
-    }
-    public static Map<String, String> importateur(Element node){
-        Map<String, String> importer = new HashMap<>();
-        List<Attribute> attrList = node.getAttributes();
-        for (Attribute attr: attrList) {
-            if(!attr.getValue().equals("")){
-                importer.putIfAbsent(attr.getName(), attr.getValue());
-                new importer(node).load();
-            }
-        }
-        return importer;
+        //JavaFileManager.getInstance().deleteFile("temp");
     }
 
     /**
@@ -46,23 +32,32 @@ public class main_engine {
      */
     public static void buildConfig(Element racine){
         Map<String, interpreter> plugins = loadPlugins();
-
+        Importer importer = new Importer(racine);
         for (Element node: xmlParser.getInstance().getChildOf(racine)) {
             //load import attr in map to pass to each variant
-            Map<String, String> importer = new HashMap<>();
-            if(node.getName().equals("import")){
-                importer.putAll(importateur(node));
+            if(!node.getName().equals("import")){
+                //apply every plugin to corresponding variant
+                try {
+                    //config file
+                    if(node.getChildren().size()<1){
+                        plugins.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
+                                                                  importer.getImport());
+                    }
+                    //featureModel file
+                    else{
+                        plugins.get(node.getName()).checConstruct(node);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
-            //apply every plugin to corresponding variant
-            try {
-                plugins.get(node.getName()).checConstruct(node);
-                plugins.get(node.getName()).checImport(node, importer);
-                plugins.get(node.getName()).prettyPrint();
-                plugins.get(node.getName()).insert();
-            }catch (Exception ignored){}
         }
         //TODO: make preprocessor juste befor compile
-        //compileManager.getInstance().maven_exec("C:\\unamur\\Master\\memoire\\engine2\\temp", "compile");
+        System.out.println("configuration assemblée");
+        compileManager.getInstance().maven_powerShell("temp", "compile");
+        System.out.println("compilation effectuée");
+        compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
+        System.out.println("packagation effectuée");
     }
     public static void checFeatureModel(Element racine){
 

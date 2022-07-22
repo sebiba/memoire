@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
-    <import uri="C:\unamur\Master\memoire\testSpring"/>
-    <Plugin url="">
-        <file path="" />
-    </Plugin>
-    <Heritage url="">
-        <file path="" />
-        <class name="" />
-    </Heritage>
-    <SpringAspect url="">
-        <file path="\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
-        <class name="dbManagerAspect" />
-    </SpringAspect>
-    <SpringPreprocessor>
-        <file path="\src\main\resources\application.properties" />
-        <var datasource="mysql" />
-    </SpringPreprocessor>
+    <import uri="C:\unamur\Master\memoire\SPL\main\featureModel.xml"/>
+    <!--<import uri="https://github.com/sebiba/memoirePOC/blob/main/FeatureModel.xml"/>-->
+    <SpringAspect name="logging"/>
+    <SpringPreprocessor name="SGBD" />
+    <Delta name="liker" />
+    <Plugin name="recherche" />
 </Configuration>

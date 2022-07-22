@@ -1,60 +1,53 @@
 package plugin;
-
 import Interfaces.interpreter;
 import com.google.auto.service.AutoService;
-import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-
 @AutoService(interpreter.class)
-public class aspect implements interpreter{
+public class Heritage implements interpreter{
+
     private String className =null;
     private String file =null;
     private Element node=null;
-    private Map<String, String> importer = new HashMap<>();
+
     @Override
     public String getName() {
-        return "SpringAspect";
+        return "Heritage";
     }
+
     @Override
     public boolean checConstruct(Element node) {
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
-                this.file = child.getAttributeValue("path");
+                file = child.getAttributeValue("path");
             } else if (Objects.equals(child.getName(), "class")) {
-                this.className = child.getAttributeValue("name");
+                className = child.getAttributeValue("name");
             }
         }
         this.node = node;
         return className != null && file != null;
     }
+
     @Override
-    public void checImport(Element node, Map<String, String> importerParam) {
-        for (Attribute attr:node.getAttributes()) {
-            if(!attr.getValue().equals("")){
-                this.importer.put(attr.getName(), attr.getValue());
-            }
-        }
-        if (!importerParam.isEmpty()){
-            for (Map.Entry<String, String> attr:importerParam.entrySet()) {
-                this.importer.putIfAbsent(attr.getKey(), attr.getValue());
-            }
-        }
+    public void checImport(String localDirect, Map<String, String> importer, String file) {
+
     }
     @Override
     public void getChildren() {
+
     }
+
     @Override
     public void getAttributs() {
 
     }
+
     @Override
     public void prettyPrint() {
-        System.out.println("$$$$$$$$$$$$$$$$$Aspect$$$$$$$$$$$$$$$$");
+        System.out.println("$$$$$$$$$$$$$$$$$Héritage$$$$$$$$$$$$$$$$");
         Map<String, String> map = new HashMap<String, String>();
         for (Element child:this.node.getChildren()) {
             map.put(child.getName(), String.valueOf(child.getAttributes()));
@@ -68,12 +61,10 @@ public class aspect implements interpreter{
 
     @Override
     public void insert() {
-        if(lib.JavaFileManager.getInstance().isFileInProjectDirectory(file)){
-            boolean test = lib.JavaFileManager.getInstance().deleteFile(file);
-            System.out.println("present");
-        }else{
-            new importer(node).loadFile(this.importer.get("uri"), this.file);
-            System.out.println("absent");
-        }
+
+    }
+
+    @Override
+    public void construct(Element node, Map<String, String> importer) {
     }
 }
