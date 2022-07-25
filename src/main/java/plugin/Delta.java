@@ -2,6 +2,7 @@ package plugin;
 
 import Interfaces.interpreter;
 import com.google.auto.service.AutoService;
+import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Element;
 import org.jsoup.Jsoup;
@@ -14,9 +15,6 @@ import java.util.regex.Pattern;
 //TODO:manage liker variant
 @AutoService(interpreter.class)
 public class Delta implements interpreter{
-    private String deltaName =null;
-    private Element node=null;
-    private Map<String, String> importer = new HashMap<>();
     private String remote=null;
 
     @Override
@@ -25,7 +23,7 @@ public class Delta implements interpreter{
     }
     @Override
     public boolean checConstruct(Element node) {
-        this.deltaName = node.getAttribute("name").getValue();
+        String deltaName = node.getAttribute("name").getValue();
         return deltaName != null;
     }
 
@@ -38,45 +36,23 @@ public class Delta implements interpreter{
             if(!this.remote.startsWith("\\") && !file.endsWith("\\")){
                 file = "\\".concat(file);
             }
+            //TODO:change as in Aspect.java
             JavaFileManager.getInstance().copyFileFrom(director + "\\" + this.remote + file, localDirect + file);
-        }
-    }
-    @Override
-    public void getChildren() {
-    }
-    @Override
-    public void getAttributs() {
-
-    }
-    @Override
-    public void prettyPrint() {
-        System.out.println("$$$$$$$$$$$$$$$$$Delta$$$$$$$$$$$$$$$$");
-        Map<String, String> map = new HashMap<String, String>();
-        for (Element child:this.node.getChildren()) {
-            map.put(child.getName(), String.valueOf(child.getAttributes()));
-        }
-        for (int i = 0; i < map.size(); i++) {
-            System.out.print(map.keySet().toArray()[i]+"\t");
-            System.out.print(map.values().toArray()[i]+"\n");
-        }
-        System.out.println(map.toString());
-    }
-    @Override
-    public void insert() {
-        if(lib.JavaFileManager.getInstance().isFileInProjectDirectory("temp")){
-            //boolean test = lib.JavaFileManager.getInstance().deleteFile(file);
-            System.out.println("present");
-        }else{
-            //new Importer(node).loadFile(this.importer.get("uri"), this.file);
-            System.out.println("absent");
         }
     }
 
     @Override
     public void construct(Element node, Map<String, String> importer) {
         this.remote = node.getAttributeValue("url");
-        if(this.remote == null )
-            this.remote = node.getAttributeValue("name");
+        if(Objects.equals(this.remote, "") || this.remote == null){
+            if(new Importer().isAnUrl(importer.values().toArray()[0].toString())){
+                List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
+                    .split(Pattern.quote(System.getProperty("file.separator"))));
+                this.remote = String.join("/",path.subList(0, path.size()-1))+"/tree/"+node.getAttributeValue("name");
+            }else{
+                this.remote = node.getAttributeValue("name");
+            }
+        }
         for (Element cat:node.getChildren()) {
             switch (cat.getName()){
                 case "addFile":

@@ -18,8 +18,6 @@ import java.util.Objects;
 public class SpringPreprocessor implements interpreter{
     private String file =null;
     private final Map<String, String> var = new HashMap<>();
-    private Element node=null;
-    private final Map<String, String> importer = new HashMap<>();
     private final String detector="##";
     @Override
     public String getName() {
@@ -36,33 +34,12 @@ public class SpringPreprocessor implements interpreter{
                 }
             }
         }
-        this.node = node;
         return file != null;
     }
 
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) {
 
-    }
-    @Override
-    public void getChildren() {
-    }
-    @Override
-    public void getAttributs() {
-
-    }
-    @Override
-    public void prettyPrint() {
-        System.out.println("$$$$$$$$$$$$$$$$$"+this.getName()+"$$$$$$$$$$$$$$$$");
-        Map<String, String> map = new HashMap<String, String>();
-        for (Element child:this.node.getChildren()) {
-            map.put(child.getName(), String.valueOf(child.getAttributes()));
-        }
-        for (int i = 0; i < map.size(); i++) {
-            System.out.print(map.keySet().toArray()[i]+"\t");
-            System.out.print(map.values().toArray()[i]+"\n");
-        }
-        System.out.println(map);
     }
 
     private int lineNbrNextPreprocessorInList(List<String>lines, String construct, int start) {
@@ -83,57 +60,55 @@ public class SpringPreprocessor implements interpreter{
         Object result = engine.eval(line);
         return (Boolean) result;
     }
-        @Override
-    public void insert() throws Exception {
-        if(lib.JavaFileManager.getInstance().isFileInProjectDirectory(file)){
-            List<String> lines = lib.JavaFileManager.getInstance().getFileContentAsLines(file);
-            int lineIf = this.lineNbrNextPreprocessorInList(lines, "if", 0);
-            int lineElse = this.lineNbrNextPreprocessorInList(lines, "else", lineIf);
-            int lineEndIf;
-            //TODO: chec multiple if in same file
-            //ELSE statement found in file
-            if(lineElse!=-1){
-                //IF statement is true AND ELSE statement founded
-                if(this.IsIfStatementTrue(lines.get(lineIf))){
-                    lines.remove(lineIf);//remove if line
-                    lines = (this.removeLinesInListFromTo(lineIf, "else", "endif", lines));//remove else statement
-                    lib.JavaFileManager.getInstance().saveListInFile(file, lines);
-                }
-                //IF statement is false AND ELSE statement founded
-                else{
-                    lines = (this.removeLinesInListFromTo(lineIf, "if", "else", lines));//remove if statement
-                    lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
-                    lines.remove(lineEndIf);//remove endif line
-                    lib.JavaFileManager.getInstance().saveListInFile(file, lines);
-                }
-            }
-            //no ELSE statement found in file
-            else{
-                //IF statement is true AND ELSE not founded
-                if(this.IsIfStatementTrue(lines.get(lineIf))){
-                    lines.remove(lineIf);//remove if line
-                    lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
-                    lines.remove(lineEndIf);//remove endif line
-                    lib.JavaFileManager.getInstance().saveListInFile(file, lines);
-                }
-                //IF statement is false AND ELSE not founded
-                else{
-                    lines = (this.removeLinesInListFromTo(lineIf, "if", "endif", lines));//remove if statement
-                    lib.JavaFileManager.getInstance().saveListInFile(file, lines);
-                }
-            }
-        }
-    }
 
     @Override
     public void construct(Element node, Map<String, String> importer) {
-        if(this.checConstruct(node)){
-            try {
-                this.insert();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        if(!this.checConstruct(node)) {
+            return;
         }
+        try {
+            if(lib.JavaFileManager.getInstance().isFileInProjectDirectory(file)){
+                List<String> lines = lib.JavaFileManager.getInstance().getFileContentAsLines(file);
+                int lineIf = this.lineNbrNextPreprocessorInList(lines, "if", 0);
+                int lineElse = this.lineNbrNextPreprocessorInList(lines, "else", lineIf);
+                int lineEndIf;
+                //TODO: chec multiple if in same file
+                //ELSE statement found in file
+                if(lineElse!=-1){
+                    //IF statement is true AND ELSE statement founded
+                    if(this.IsIfStatementTrue(lines.get(lineIf))){
+                        lines.remove(lineIf);//remove if line
+                        lines = (this.removeLinesInListFromTo(lineIf, "else", "endif", lines));//remove else statement
+                        lib.JavaFileManager.getInstance().saveListInFile(file, lines);
+                    }
+                    //IF statement is false AND ELSE statement founded
+                    else{
+                        lines = (this.removeLinesInListFromTo(lineIf, "if", "else", lines));//remove if statement
+                        lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
+                        lines.remove(lineEndIf);//remove endif line
+                        lib.JavaFileManager.getInstance().saveListInFile(file, lines);
+                    }
+                }
+                //no ELSE statement found in file
+                else{
+                    //IF statement is true AND ELSE not founded
+                    if(this.IsIfStatementTrue(lines.get(lineIf))){
+                        lines.remove(lineIf);//remove if line
+                        lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
+                        lines.remove(lineEndIf);//remove endif line
+                        lib.JavaFileManager.getInstance().saveListInFile(file, lines);
+                    }
+                    //IF statement is false AND ELSE not founded
+                    else{
+                        lines = (this.removeLinesInListFromTo(lineIf, "if", "endif", lines));//remove if statement
+                        lib.JavaFileManager.getInstance().saveListInFile(file, lines);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
     public List<String> removeLinesInListFromTo(int start, String detector1, String detector2, List<String> lines){
         int lineDetector1 = this.lineNbrNextPreprocessorInList(lines, detector1, start);

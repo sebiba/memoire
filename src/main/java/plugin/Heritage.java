@@ -35,34 +35,6 @@ public class Heritage implements interpreter{
     public void checImport(String localDirect, Map<String, String> importer, String file) {
 
     }
-    @Override
-    public void getChildren() {
-
-    }
-
-    @Override
-    public void getAttributs() {
-
-    }
-
-    @Override
-    public void prettyPrint() {
-        System.out.println("$$$$$$$$$$$$$$$$$Héritage$$$$$$$$$$$$$$$$");
-        Map<String, String> map = new HashMap<String, String>();
-        for (Element child:this.node.getChildren()) {
-            map.put(child.getName(), String.valueOf(child.getAttributes()));
-        }
-        for (int i = 0; i < map.size(); i++) {
-            System.out.print(map.keySet().toArray()[i]+"\t");
-            System.out.print(map.values().toArray()[i]+"\n");
-        }
-        System.out.println(map.toString());
-    }
-
-    @Override
-    public void insert() {
-
-    }
 
     @Override
     public void construct(Element node, Map<String, String> importer) {

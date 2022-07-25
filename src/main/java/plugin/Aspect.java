@@ -2,17 +2,22 @@ package plugin;
 
 import Interfaces.interpreter;
 import com.google.auto.service.AutoService;
+import lib.Importer;
 import lib.JavaFileManager;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Element;
+
 import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
 @AutoService(interpreter.class)
 public class Aspect implements interpreter{
     private String remote =null;
-    private Map<String, String> importer = new HashMap<>();
 
     @Override
     public String getName() {
@@ -32,8 +37,15 @@ public class Aspect implements interpreter{
     @Override
     public void construct(Element node, Map<String, String> importer) {
         this.remote = node.getAttributeValue("url");
-        if(this.remote.isEmpty())
-            this.remote = node.getAttributeValue("name");
+        if(Objects.equals(this.remote, "") || this.remote == null){
+            if(new Importer().isAnUrl(importer.values().toArray()[0].toString())){
+                List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
+                    .split(Pattern.quote(System.getProperty("file.separator"))));
+                this.remote = String.join("/",path)+"/"+node.getAttributeValue("name");
+            }else{
+                this.remote = node.getAttributeValue("name");
+            }
+        }
         for (Element child : node.getChildren()) {
             if (Objects.equals(child.getName(), "file")) {
                 this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
@@ -48,29 +60,16 @@ public class Aspect implements interpreter{
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
         if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)){
-            JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
-        }
-    }
-    @Override
-    public void getChildren() {
-    }
-    @Override
-    public void getAttributs() {
-
-    }
-    @Override
-    public void prettyPrint() {
-        System.out.println("$$$$$$$$$$$$$$$$$Aspect$$$$$$$$$$$$$$$$");
-    }
-
-    @Override
-    public void insert() {
-        if(lib.JavaFileManager.getInstance().isFileInProjectDirectory("temp")){
-            //boolean test = lib.JavaFileManager.getInstance().deleteFile(file);
-            System.out.println("present");
-        }else{
-            //new Importer(node).loadFile(this.importer.get("uri"), this.file);
-            System.out.println("absent");
+            if(new Importer().isAnUrl(this.remote)){
+                try {
+                    JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+
+                                                file, localDirect+file);
+                } catch (IOException | GitAPIException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
+            }
         }
     }
 }

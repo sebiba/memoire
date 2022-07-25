@@ -1,20 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FeatureModel>
-    <CompCond url="">
-        <file path="" />
-        <cond line="">
-            <value variable="" />
-        </cond>
-    </CompCond>
-    <Plugin url="">
-        <file path="" />
-    </Plugin>
-    <Heritage url="">
-        <file path="" />
-        <class name="" />
-    </Heritage>
-    <SpringAspect url="">
+<FeatureModel xmlns:th="http://www.w3.org/1999/xhtml">
+    <SpringAspect name="logging">
         <file path="\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
         <class name="dbManagerAspect" />
     </SpringAspect>
+    <SpringPreprocessor name="SGBD">
+        <file path="\src\main\resources\application.properties" />
+        <var datasource="mysql" />
+    </SpringPreprocessor>
+    <Delta name="liker">
+        <addFile>
+            <file path="src/main/java/com/example/testspring/Model/User.java" />
+            <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
+        </addFile>
+        <deleteFile>
+            <file path="" />
+            <file path="" />
+        </deleteFile>
+        <modif>
+            <file type="java" path="src/main/java/com/example/testspring/Controler/ShopControler.java">
+                <add>
+                    @PostMapping("/bib/like")
+                    private String likeProduct(Model model, @RequestParam String ean, @RequestParam String name, RedirectAttributes redirAttrs) {
+                    Product produit = dbManager.findProductByEan(ean);
+                    User user = dbManager.findUserByName(name);
+                    //create new user
+                    if (user == null) {
+                    dbManager.addUser(name);
+                    user = dbManager.findUserByName(name);
+                    } else {
+                    if(produit.getLikers().contains(user)){
+                    redirAttrs.addFlashAttribute("error", "Vous ne pouvez pas liker 2 fois le même produits");
+                    return "redirect:/bib";
+                    }
+                    }
+                    produit.addLiker(user);
+                    dbManager.getProductRepository().save(produit);
+                    return "redirect:/bib";
+                    }
+                </add>
+            </file>
+            <file type="java" path="src/main/java/com/example/testspring/dbAccess/dbManager.java">
+                <add>
+                    public User findUserByName(String name){
+                    return userRepository.findByName(name);
+                    }
+                    public void addUser(String name) {
+                    this.userRepository.save(new User(name));
+                    }
+                </add>
+            </file>
+            <file type="html" path="src/main/resources/templates/bibliotheque.html">
+                <add endOf="detail">
+                    <form id="likerForm" action="#" th:action="@{/bib/like}" method="post">
+                        <input type="hidden" name="ean" th:value="${productDetail.ean}"/>
+                        <p>Nom: <input type="text" name="name"/></p>
+                        <p><input type="submit" value="Submit" /></p>
+                    </form>
+                </add>
+            </file>
+        </modif>
+    </Delta>
+    <Plugin name="recherche">
+        <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
+        <file path="src/main/resources/static/rechercheNavBar.html" />
+    </Plugin>
 </FeatureModel>

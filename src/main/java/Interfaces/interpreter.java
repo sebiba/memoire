@@ -10,12 +10,5 @@ public interface interpreter {
 
     void checImport(String localDirect, Map<String, String> importer, String file);
 
-    void getChildren();
-    void getAttributs();
-
-    void prettyPrint();
-
-    void insert() throws Exception;
-
     void construct(Element node, Map<String, String> importer);
 }

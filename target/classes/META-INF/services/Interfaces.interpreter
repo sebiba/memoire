@@ -1,4 +1,5 @@
+plugin.Aspect
 plugin.Delta
+plugin.Heritage
+plugin.Plugin
 plugin.SpringPreprocessor
-plugin.aspect
-plugin.heritage
