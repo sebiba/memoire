@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.interpreter;
+import Interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -11,8 +11,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 
-@AutoService(interpreter.class)
-public class Plugin implements interpreter{
+@AutoService(Interpreter.class)
+public class Plugin implements Interpreter {
     private String remote =null;
 
     @Override
@@ -46,6 +46,12 @@ public class Plugin implements interpreter{
             }
         }
     }
+
+    @Override
+    public void setConfigFile(Element node) {
+
+    }
+
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) {
         List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()

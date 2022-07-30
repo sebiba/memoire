@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FeatureModel xmlns:th="http://www.w3.org/1999/xhtml">
-    <SpringAspect name="logging">
-        <file path="\src\main\java\com\example\testspring\dbAccess\dbManagerAspect.java" />
-        <class name="dbManagerAspect" />
+    <SpringAspect name="logging" url="">
+        <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
+        <class name="DBManagerAspect" />
     </SpringAspect>
-    <SpringPreprocessor name="SGBD">
+    <SpringPreprocessor name="SGBD" url="">
         <file path="\src\main\resources\application.properties" />
         <var datasource="mysql" />
     </SpringPreprocessor>
-    <Delta name="liker">
-        <addFile>
-            <file path="src/main/java/com/example/testspring/Model/User.java" />
-            <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
-        </addFile>
-        <deleteFile>
-            <file path="" />
-            <file path="" />
-        </deleteFile>
+    <Delta name="liker" require="compte">
         <modif>
             <file type="java" path="src/main/java/com/example/testspring/Controler/ShopControler.java">
                 <add>
@@ -40,7 +32,7 @@
                     }
                 </add>
             </file>
-            <file type="java" path="src/main/java/com/example/testspring/dbAccess/dbManager.java">
+            <file type="java" path="src/main/java/com/example/testspring/dbAccess/DBManager.java">
                 <add>
                     public User findUserByName(String name){
                     return userRepository.findByName(name);
@@ -61,8 +53,15 @@
             </file>
         </modif>
     </Delta>
-    <Plugin name="recherche">
+    <Delta name="compte">
+        <addFile>
+            <file path="src/main/java/com/example/testspring/Model/User.java" />
+            <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
+        </addFile>
+    </Delta>
+    <Plugin name="recherche" url="">
         <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
+        <file path="src/main/java/com/example/testspring/Interface/PluginInterface.java" />
         <file path="src/main/resources/static/rechercheNavBar.html" />
     </Plugin>
 </FeatureModel>

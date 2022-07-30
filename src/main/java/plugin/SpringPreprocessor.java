@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.interpreter;
+import Interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Objects;
 
 
-@AutoService(interpreter.class)
-public class SpringPreprocessor implements interpreter{
+@AutoService(Interpreter.class)
+public class SpringPreprocessor implements Interpreter {
     private String file =null;
-    private final Map<String, String> var = new HashMap<>();
     private final String detector="##";
+    private Map<String, String> configVar=new HashMap<>();
     @Override
     public String getName() {
         return "SpringPreprocessor";
@@ -28,39 +28,14 @@ public class SpringPreprocessor implements interpreter{
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
                 this.file = child.getAttributeValue("path");
-            } else if (Objects.equals(child.getName(), "var")) {
-                for (Attribute attr:child.getAttributes()) {
-                    this.var.put(attr.getName(), attr.getValue());
-                }
             }
         }
         return file != null;
     }
-
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) {
 
     }
-
-    private int lineNbrNextPreprocessorInList(List<String>lines, String construct, int start) {
-        for (int i = start; i < lines.size(); i++) {
-            if(lines.get(i).contains(this.detector) && lines.get(i).contains(construct)){
-                return i;
-            }
-        }
-        return -1;
-    }
-    private Boolean IsIfStatementTrue(String line) throws ScriptException {
-        for (Map.Entry<String, String> variable:this.var.entrySet()) {
-            line = line.replace(variable.getKey(), "\""+variable.getValue()+"\"");
-        }
-        line = line.replace("##", "");
-        line = line.replace("if", "");
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
-        Object result = engine.eval(line);
-        return (Boolean) result;
-    }
-
     @Override
     public void construct(Element node, Map<String, String> importer) {
         if(!this.checConstruct(node)) {
@@ -110,7 +85,34 @@ public class SpringPreprocessor implements interpreter{
         }
 
     }
-    public List<String> removeLinesInListFromTo(int start, String detector1, String detector2, List<String> lines){
+    @Override
+    public void setConfigFile(Element node){
+        for (Element var:node.getChildren()) {
+            List<Attribute> attr= var.getAttributes();
+            for (Attribute a:attr) {
+                this.configVar.put(a.getName(), a.getValue());
+            }
+        }
+    }
+    private int lineNbrNextPreprocessorInList(List<String>lines, String construct, int start) {
+        for (int i = start; i < lines.size(); i++) {
+            if(lines.get(i).contains(this.detector) && lines.get(i).contains(construct)){
+                return i;
+            }
+        }
+        return -1;
+    }
+    private boolean IsIfStatementTrue(String line) throws ScriptException {
+        for (Map.Entry<String, String> variable:this.configVar.entrySet()) {
+            line = line.replace(variable.getKey(), "\""+variable.getValue()+"\"");
+        }
+        line = line.replace("##", "");
+        line = line.replace("if", "");
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+        Object result = engine.eval(line);
+        return (Boolean) result;
+    }
+    private List<String> removeLinesInListFromTo(int start, String detector1, String detector2, List<String> lines){
         int lineDetector1 = this.lineNbrNextPreprocessorInList(lines, detector1, start);
         int lineDetector2 = this.lineNbrNextPreprocessorInList(lines, detector2, start);
         //remove else to endif statement
@@ -126,3 +128,18 @@ public class SpringPreprocessor implements interpreter{
         return lines;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

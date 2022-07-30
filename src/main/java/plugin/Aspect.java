@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.interpreter;
+import Interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -15,8 +15,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 
-@AutoService(interpreter.class)
-public class Aspect implements interpreter{
+@AutoService(Interpreter.class)
+public class Aspect implements Interpreter {
     private String remote =null;
 
     @Override
@@ -33,6 +33,24 @@ public class Aspect implements interpreter{
             }
         }
         return false;
+    }
+    @Override
+    public void checImport(String localDirect, Map<String, String> importer, String file) {
+        List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
+            .split(Pattern.quote(System.getProperty("file.separator"))));
+        String director = String.join("\\",path.subList(0, path.size()-1));
+        if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)){
+            if(new Importer().isAnUrl(this.remote)){
+                try {
+                    JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+
+                        file, localDirect+file);
+                } catch (IOException | GitAPIException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
+            }
+        }
     }
     @Override
     public void construct(Element node, Map<String, String> importer) {
@@ -54,22 +72,9 @@ public class Aspect implements interpreter{
             }
         }
     }
+
     @Override
-    public void checImport(String localDirect, Map<String, String> importer, String file) {
-        List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
-            .split(Pattern.quote(System.getProperty("file.separator"))));
-        String director = String.join("\\",path.subList(0, path.size()-1));
-        if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)){
-            if(new Importer().isAnUrl(this.remote)){
-                try {
-                    JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+
-                                                file, localDirect+file);
-                } catch (IOException | GitAPIException e) {
-                    throw new RuntimeException(e);
-                }
-            }else{
-                JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
-            }
-        }
+    public void setConfigFile(Element node) {
+
     }
 }

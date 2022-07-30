@@ -1,13 +1,13 @@
 exceptions\StructureNotSupportedException.class
+Interfaces\Interpreter.class
 main_engine.class
 plugin\Aspect.class
-plugin\Heritage.class
-META-INF\services\Interfaces.interpreter
+exceptions\RequirementException.class
 lib\xmlParser.class
 plugin\Delta.class
 lib\compileManager.class
 plugin\Plugin.class
 lib\Importer.class
-Interfaces\interpreter.class
+META-INF\services\Interfaces.Interpreter
 lib\JavaFileManager.class
 plugin\SpringPreprocessor.class

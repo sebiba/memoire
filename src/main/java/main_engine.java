@@ -1,8 +1,9 @@
-import Interfaces.interpreter;
+import Interfaces.Interpreter;
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
 import lib.Importer;
 import lib.JavaFileManager;
+import lib.compileManager;
 import lib.xmlParser;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Document;
@@ -13,13 +14,13 @@ import java.util.*;
 
 public class main_engine {
     public static void main(String[] args) {
-        Document document = JavaFileManager.getInstance().getXmlFile("src/main/resources/config.xml");
+        Document document = JavaFileManager.getInstance().getXmlFile(args[0]);
         assert document != null;
         Element racine = document.getRootElement();
         switch (racine.getName()){
             case "Configuration":
                 try {
-                    buildConfig(racine);
+                    buildConfig(racine, args.length > 1 && Boolean.parseBoolean(args[1]));
                 }catch (RequirementException e){
                     e.printStackTrace();
                 }
@@ -28,15 +29,14 @@ public class main_engine {
                 checFeatureModel(racine);
                 break;
         }
-        //JavaFileManager.getInstance().deleteFile("temp");
     }
 
     /**
      * build de desired configuration corresponding to the xml file
      * @param racine root xml element from the xml file
      */
-    public static void buildConfig(Element racine) throws RequirementException {
-        Map<String, interpreter> plugins = loadPlugins();
+    public static void buildConfig(Element racine, Boolean withoutTest) throws RequirementException {
+        Map<String, Interpreter> plugins = loadPlugins();
         Importer importer = new Importer(racine);
         List<String> gitBranches = new ArrayList<>();
         if(importer.isSourceGitRepo()){
@@ -55,21 +55,16 @@ public class main_engine {
             if(!node.getName().equals("import")){
                 //apply every plugin to corresponding variant
                 try {
-                    //config file
-                    if(node.getChildren().size()<1){
-                        if(importer.isSourceGitRepo()){
-                            if(!gitBranches.contains(node.getAttributeValue("name")) && !gitBranches.isEmpty()){
-                                throw new StructureNotSupportedException("The branches '"+node.getAttributeValue("name")+"' has not been found on github");
-                            }
+                    if(importer.isSourceGitRepo()){
+                        if(!gitBranches.contains(node.getAttributeValue("name")) && !gitBranches.isEmpty()){
+                            throw new StructureNotSupportedException("The branches '"+node.getAttributeValue("name")+"' has not been found on github");
                         }
-                        plugins.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
-                                    importer.getImport());
-
                     }
-                    //featureModel file
-                    else{
-                        plugins.get(node.getName()).checConstruct(node);
+                    if(racine.getName().equals("Configuration") && node.getChildren().size()>0){
+                        plugins.get(node.getName()).setConfigFile(node);
                     }
+                    plugins.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
+                                importer.getImport());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -79,7 +74,11 @@ public class main_engine {
         System.out.println("configuration assemblée");
         //compileManager.getInstance().maven_powerShell("temp", "compile");
         System.out.println("compilation effectuée");
-        //compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
+        if(withoutTest){
+            //compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
+        }else{
+            //compileManager.getInstance().maven_powerShell("temp", "package");
+        }
         System.out.println("packagation effectuée");
     }
     public static void checFeatureModel(Element racine){
@@ -90,10 +89,10 @@ public class main_engine {
      * Load plugin available for prossessing
      * @return Map<String, interpreter> plugin's name and the plugin
      */
-    static public Map<String, interpreter> loadPlugins(){
-        ServiceLoader<interpreter> serviceLoader = ServiceLoader.load(interpreter.class);
-        Map<String, interpreter> services = new HashMap<>();
-        for (interpreter service : serviceLoader) {
+    static public Map<String, Interpreter> loadPlugins(){
+        ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
+        Map<String, Interpreter> services = new HashMap<>();
+        for (Interpreter service : serviceLoader) {
             services.put(service.getName(), service);
         }
         return services;

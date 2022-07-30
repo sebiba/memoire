@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.interpreter;
+import Interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -12,9 +12,8 @@ import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 
-//TODO:manage liker variant
-@AutoService(interpreter.class)
-public class Delta implements interpreter{
+@AutoService(Interpreter.class)
+public class Delta implements Interpreter {
     private String remote=null;
 
     @Override
@@ -66,6 +65,10 @@ public class Delta implements interpreter{
                     break;
             }
         }
+    }
+
+    @Override
+    public void setConfigFile(Element node) {
     }
 
     private void fileDeleter(Element cat) {
