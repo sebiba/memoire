@@ -44,12 +44,12 @@ public class JavaFileManager {
         }
         return false;
     }
-    public boolean deleteFile(String path){
+    public void deleteFile(String path){
         if(!path.startsWith("\\") && !tempPath.endsWith("\\")){
             tempPath = tempPath.concat("\\");
         }
         File delete = new File(tempPath+path);
-        return delete.delete();
+        delete.delete();
     }
 
     /**
@@ -119,7 +119,7 @@ public class JavaFileManager {
         return document;
     }
 
-    public void downloadBrancheFromGit(String url) throws TransportException{
+    public void downloadBrancheFromGit(String url){
         try {
             System.out.println("Cloning "+url+" into "+tempPath);
             Git call = Git.cloneRepository()
@@ -141,7 +141,7 @@ public class JavaFileManager {
         }
     }
 
-    public void downloadFileFromGitTo(String urlGit, String path) throws GitAPIException, IOException {
+    public void downloadFileFromGitTo(String urlGit, String path) {
         URL url = null;
         urlGit = urlGit.replace(":\\", ":\\\\");
         urlGit = urlGit.replace("www.github.com", "raw.githubusercontent.com");
@@ -184,7 +184,7 @@ public class JavaFileManager {
         return new File(tempPath).delete();
     }
 
-    public List<String> getBranchesFromGitRepo(String url) throws GitAPIException, IOException {
+    public List<String> getBranchesFromGitRepo(String url){
         Collection<Ref> refs;
         List<String> branches = new ArrayList<>();
         try {

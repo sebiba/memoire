@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.Interpreter;
+import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -39,56 +39,29 @@ public class SpringPreprocessor implements Interpreter {
             try {
                 if(lib.JavaFileManager.getInstance().isFileInProjectDirectory(file.getAttributeValue("path"))){
                     List<String> lines = lib.JavaFileManager.getInstance().getFileContentAsLines(file.getAttributeValue("path"));
-                    List<Attribute> attr = file.getChild("var").getAttributes();
+                    List<Element> varList = file.getChildren("var");
                     Map<String, String> fileVar = new HashMap<>();
-                    attr.forEach(a->fileVar.put(a.getName(), a.getValue()));
-                    int lineStart = 0;
+                    for (Element variable:varList) {
+                        variable.getAttributes().forEach(a->fileVar.put(a.getName(), a.getValue()));
+                    }
+                    int lineStart;
                     while(true) {
                         int lineIf=0;
                         int lineElse=-1;
                         do{
-                            if(lineElse<0)lineStart=lineIf+1;
-                            else lineStart = lineElse;
+                            if(fileVar.keySet().stream().noneMatch(lines.get(lineIf)::contains))lineStart=lineIf+1;
+                            else {
+                                lineStart = 0;
+                            }
                             lineIf = this.lineNbrNextPreprocessorInList(lines, "if", lineStart);
                             if(lineIf==-1) break;
-                        //}while(!(lineIf >0) || !lines.get(lineIf).contains(fileVar.keySet().toArray()[0].toString()));
-                        }while(!(lineIf >0) || fileVar.keySet().stream().noneMatch(lines.get(lineIf)::contains));
+                        }while(!(lineIf >-1) || fileVar.keySet().stream().noneMatch(lines.get(lineIf)::contains));
                         if(lineIf<0){
                             break;
                         }
                         lineElse = this.lineNbrNextPreprocessorInList(lines, "else", lineIf);
-                        int lineEndIf;
-                        //ELSE statement found in file
-                        if (lineElse != -1) {
-                            //IF statement is true AND ELSE statement founded
-                            if (this.IsIfStatementTrue(lines.get(lineIf))) {
-                                lines.remove(lineIf);//remove if line
-                                lines = (this.removeLinesInListFromTo(lineIf, "else", "endif", lines));//remove else statement
-                                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
-                            }
-                            //IF statement is false AND ELSE statement founded
-                            else {
-                                lines = (this.removeLinesInListFromTo(lineIf, "if", "else", lines));//remove if statement
-                                lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
-                                lines.remove(lineEndIf);//remove endif line
-                                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
-                            }
-                        }
-                        //no ELSE statement found in file
-                        else {
-                            //IF statement is true AND ELSE not founded
-                            if (this.IsIfStatementTrue(lines.get(lineIf))) {
-                                lines.remove(lineIf);//remove if line
-                                lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
-                                lines.remove(lineEndIf);//remove endif line
-                                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
-                            }
-                            //IF statement is false AND ELSE not founded
-                            else {
-                                lines = (this.removeLinesInListFromTo(lineIf, "if", "endif", lines));//remove if statement
-                                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
-                            }
-                        }
+                        int lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
+                        this.directiveHandler(lineIf, lineElse, lineEndIf, file, lines);
                     }
                 }
             } catch (ClassCastException e){
@@ -104,6 +77,40 @@ public class SpringPreprocessor implements Interpreter {
             List<Attribute> attr= var.getAttributes();
             for (Attribute a:attr) {
                 this.configVar.put(a.getName(), a.getValue());
+            }
+        }
+    }
+
+    private void directiveHandler(int lineIf, int lineElse, int lineEndIf, Element file, List<String>lines) throws ScriptException {
+        //ELSE statement found in file
+        if (lineElse != -1 && lineElse < lineEndIf) {
+            //IF statement is true AND ELSE statement founded
+            if (this.IsIfStatementTrue(lines.get(lineIf))) {
+                lines.remove(lineIf);//remove if line
+                lines = this.removeLinesInListFromTo(lineIf, "else", "endif", lines);//remove else statement
+                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
+            }
+            //IF statement is false AND ELSE statement founded
+            else {
+                lines = (this.removeLinesInListFromTo(lineIf, "if", "else", lines));//remove if statement
+                lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
+                lines.remove(lineEndIf);//remove endif line
+                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
+            }
+        }
+        //no ELSE statement found in file
+        else {
+            //IF statement is true AND ELSE not founded
+            if (this.IsIfStatementTrue(lines.get(lineIf))) {
+                lines.remove(lineIf);//remove if line
+                lineEndIf = this.lineNbrNextPreprocessorInList(lines, "endif", lineIf);
+                lines.remove(lineEndIf);//remove endif line
+                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
+            }
+            //IF statement is false AND ELSE not founded
+            else {
+                lines = (this.removeLinesInListFromTo(lineIf, "if", "endif", lines));//remove if statement
+                lib.JavaFileManager.getInstance().saveListInFile(file.getAttributeValue("path"), lines);
             }
         }
     }

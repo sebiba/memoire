@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.Interpreter;
+import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;

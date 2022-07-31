@@ -1,4 +1,4 @@
-package Interfaces;
+package interfaces;
 
 import org.jdom2.Element;
 

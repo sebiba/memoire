@@ -87,9 +87,6 @@ public class Importer {
     public String getDirectory(){
         return this.directory;
     }
-    public String getName() {
-        return "import";
-    }
     public Element getFeatureModelFor(String name) {
         Element feature;
         Document xml = JavaFileManager.getInstance().getXmlFile(this.localImport);

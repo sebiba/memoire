@@ -1,6 +1,6 @@
 package plugin;
 
-import Interfaces.Interpreter;
+import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -41,12 +41,7 @@ public class Aspect implements Interpreter {
         String director = String.join("\\",path.subList(0, path.size()-1));
         if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)){
             if(new Importer().isAnUrl(this.remote)){
-                try {
-                    JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+
-                        file, localDirect+file);
-                } catch (IOException | GitAPIException e) {
-                    throw new RuntimeException(e);
-                }
+                JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+file, localDirect+file);
             }else{
                 JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
             }

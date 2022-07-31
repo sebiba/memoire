@@ -1,9 +1,8 @@
-import Interfaces.Interpreter;
+import interfaces.Interpreter;
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
 import lib.Importer;
 import lib.JavaFileManager;
-import lib.compileManager;
 import lib.xmlParser;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Document;
@@ -53,12 +52,8 @@ public class main_engine {
         Importer importer = new Importer(racine);
         List<String> gitBranches = new ArrayList<>();
         if(importer.isSourceGitRepo()){
-            try {
-                String url = importer.getRemoteImport().substring(0,importer.getRemoteImport().lastIndexOf("/"));
-                gitBranches = JavaFileManager.getInstance().getBranchesFromGitRepo(url);
-            } catch (GitAPIException | IOException e) {
-                throw new RuntimeException(e);
-            }
+            String url = importer.getRemoteImport().substring(0,importer.getRemoteImport().lastIndexOf("/"));
+            gitBranches = JavaFileManager.getInstance().getBranchesFromGitRepo(url);
         }
         if(!importer.checSelection(racine)){
             throw new RequirementException("Erreur lors de la verification des requirements");
