@@ -14,6 +14,10 @@ import java.util.*;
 
 public class main_engine {
     public static void main(String[] args) {
+        if(args.length == 0){
+            showHelp();
+            return;
+        }
         Document document = JavaFileManager.getInstance().getXmlFile(args[0]);
         assert document != null;
         Element racine = document.getRootElement();
@@ -29,6 +33,15 @@ public class main_engine {
                 checFeatureModel(racine);
                 break;
         }
+    }
+
+    /**
+     * show message if no parameters founded
+     */
+    private static void showHelp() {
+        System.out.println("Des paramètres sont manquant...");
+        System.out.println("paramètres 1: chemin vers le fichier de configuration");
+        System.out.println("paramètres 2: Optionnel boolean true ou false pour ne pas executer de tests lors de la génération du fichier jar.");
     }
 
     /**

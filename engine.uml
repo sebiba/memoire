@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>exceptions</OriginalElement>
+  <nodes>
+    <node x="107.0" y="682.8544401544401">lib.compileManager</node>
+    <node x="-212.0" y="-23.0">plugin.Delta</node>
+    <node x="806.0671814671812" y="703.3544401544401">exceptions.RequirementException</node>
+    <node x="140.00000000000006" y="32.0">plugin.Aspect</node>
+    <node x="446.0" y="253.0">lib.xmlParser</node>
+    <node x="766.0" y="253.0">main_engine</node>
+    <node x="107.0" y="253.0">lib.JavaFileManager</node>
+    <node x="-297.4548262548262" y="319.30115830115824">lib.Importer</node>
+    <node x="339.0" y="-194.0">Interfaces.Interpreter</node>
+    <node x="492.0" y="-1.0">plugin.SpringPreprocessor</node>
+    <node x="529.4810810810809" y="703.3544401544401">exceptions.StructureNotSupportedException</node>
+    <node x="936.0" y="32.0">plugin.Plugin</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="plugin.Aspect" target="lib.Importer" relationship="CREATE">
+      <point x="-5.6843418860808015E-14" y="-60.5" />
+      <point x="306.0" y="-62.91604633204631" />
+      <point x="-229.5" y="-62.91604633204631" />
+      <point x="-69.04517374517383" y="-171.0" />
+    </edge>
+    <edge source="plugin.SpringPreprocessor" target="plugin.SpringPreprocessor" relationship="DEPENDENCY">
+      <point x="0.0" y="-93.5" />
+      <point x="704.0" y="-18.5" />
+      <point x="943.5" y="-18.5" />
+      <point x="943.5" y="14.5" />
+      <point x="212.0" y="-78.0" />
+    </edge>
+    <edge source="plugin.Delta" target="lib.Importer" relationship="CREATE">
+      <point x="0.0" y="-115.5" />
+      <point x="-46.0" y="-55.56103783783784" />
+      <point x="-229.5" y="-55.56103783783784" />
+      <point x="-69.04517374517383" y="-171.0" />
+    </edge>
+    <edge source="lib.compileManager" target="lib.compileManager" relationship="TO_ONE">
+      <point x="0.0" y="-50.0" />
+      <point x="233.5" y="653.8011583011582" />
+      <point x="453.5" y="653.8011583011582" />
+      <point x="453.5" y="724.8544401544401" />
+      <point x="126.5" y="-8.0" />
+    </edge>
+    <edge source="lib.Importer" target="lib.Importer" relationship="DEPENDENCY">
+      <point x="14.99982625482616" y="-171.0" />
+      <point x="-145.455" y="301.80115830115824" />
+      <point x="-5.954826254826173" y="301.80115830115824" />
+      <point x="-5.954826254826173" y="490.30115830115824" />
+      <point x="137.0" y="0.0" />
+    </edge>
+    <edge source="plugin.Delta" target="Interfaces.Interpreter" relationship="REALIZATION">
+      <point x="166.0" y="78.0" />
+      <point x="291.0" y="170.5" />
+      <point x="291.0" y="209.0" />
+      <point x="1285.5" y="209.0" />
+      <point x="1285.5" y="-133.5" />
+      <point x="166.0" y="0.0" />
+    </edge>
+    <edge source="lib.xmlParser" target="lib.xmlParser" relationship="CREATE">
+      <point x="-4.5" y="72.0" />
+      <point x="579.0" y="450.5" />
+      <point x="555.0153722316603" y="450.5" />
+      <point x="555.0153722316603" y="389.1692604787644" />
+      <point x="-45.82326375289574" y="64.16926047876439" />
+    </edge>
+    <edge source="lib.JavaFileManager" target="lib.JavaFileManager" relationship="TO_ONE">
+      <point x="9.5" y="149.0" />
+      <point x="263.5" y="572.5" />
+      <point x="422.5" y="572.5" />
+      <point x="422.5" y="389.5" />
+      <point x="147.0" y="-12.5" />
+    </edge>
+    <edge source="plugin.Plugin" target="Interfaces.Interpreter" relationship="REALIZATION">
+      <point x="-15.0" y="60.5" />
+      <point x="1087.0" y="209.0" />
+      <point x="1285.5" y="209.0" />
+      <point x="1285.5" y="-133.5" />
+      <point x="166.0" y="0.0" />
+    </edge>
+    <edge source="plugin.Delta" target="plugin.Delta" relationship="DEPENDENCY">
+      <point x="167.4255629343628" y="-99.34602316602322" />
+      <point x="235.760101930502" y="-6.846023166023215" />
+      <point x="235.760101930502" y="14.5" />
+      <point x="166.0" y="-78.0" />
+    </edge>
+    <edge source="main_engine" target="exceptions.RequirementException" relationship="CREATE">
+      <point x="10.567181467181172" y="60.0" />
+      <point x="0.0" y="-14.5" />
+    </edge>
+    <edge source="lib.Importer" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="-1.7374517383927923E-4" y="-171.0" />
+      <point x="-160.455" y="241.60818532818533" />
+      <point x="254.0" y="241.60818532818533" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="plugin.Aspect" target="plugin.Aspect" relationship="DEPENDENCY">
+      <point x="32.32241544401529" y="-57.10187181467188" />
+      <point x="338.32241544401535" y="-20.5" />
+      <point x="462.00000000000006" y="-20.5" />
+      <point x="156.0" y="-60.5" />
+    </edge>
+    <edge source="main_engine" target="lib.Importer" relationship="CREATE">
+      <point x="127.56700000000001" y="60.0" />
+      <point x="1022.567" y="800.354" />
+      <point x="-314.955" y="800.354" />
+      <point x="-314.955" y="-45.0" />
+      <point x="-229.5" y="-45.0" />
+      <point x="-69.04517374517383" y="-171.0" />
+    </edge>
+    <edge source="plugin.Plugin" target="plugin.Plugin" relationship="DEPENDENCY">
+      <point x="30.154761389960868" y="-63.13675057915063" />
+      <point x="1132.1547613899609" y="-27.8966393822393" />
+      <point x="1249.8706934362933" y="-27.8966393822393" />
+      <point x="1249.8706934362933" y="42.94172664092659" />
+      <point x="114.64306409266351" y="-49.55827335907341" />
+    </edge>
+    <edge source="plugin.Plugin" target="lib.Importer" relationship="CREATE">
+      <point x="0.0" y="-60.5" />
+      <point x="1102.0" y="-45.0" />
+      <point x="-229.5" y="-45.0" />
+      <point x="-69.04517374517383" y="-171.0" />
+    </edge>
+    <edge source="lib.compileManager" target="lib.compileManager" relationship="CREATE">
+      <point x="-15.0" y="-50.0" />
+      <point x="218.5" y="638.8011583011582" />
+      <point x="468.5" y="638.8011583011582" />
+      <point x="468.5" y="749.8544401544401" />
+      <point x="126.5" y="17.0" />
+    </edge>
+    <edge source="main_engine" target="main_engine" relationship="DEPENDENCY">
+      <point x="124.3731861621618" y="52.55806023166019" />
+      <point x="1022.7527182702698" y="365.5580602316602" />
+      <point x="1022.7527182702698" y="365.6267759073359" />
+      <point x="1172.6634921389962" y="365.6267759073359" />
+      <point x="1172.6634921389962" y="328.0" />
+      <point x="129.0" y="15.0" />
+    </edge>
+    <edge source="main_engine" target="exceptions.StructureNotSupportedException" relationship="CREATE">
+      <point x="-109.0189189189191" y="60.0" />
+      <point x="124.5" y="-14.5" />
+    </edge>
+    <edge source="main_engine" target="Interfaces.Interpreter" relationship="DEPENDENCY">
+      <point x="129.0" y="0.0" />
+      <point x="1345.5" y="313.0" />
+      <point x="1345.5" y="-148.5" />
+      <point x="166.0" y="-15.0" />
+    </edge>
+    <edge source="main_engine" target="lib.xmlParser" relationship="DEPENDENCY">
+      <point x="-129.0" y="12.0" />
+      <point x="137.5" y="0.0" />
+    </edge>
+    <edge source="plugin.SpringPreprocessor" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="0.0" y="93.5" />
+      <point x="704.0" y="231.0" />
+      <point x="254.0" y="231.0" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="plugin.Plugin" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="0.0" y="60.5" />
+      <point x="1102.0" y="219.5" />
+      <point x="254.0" y="219.5" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="plugin.Aspect" target="Interfaces.Interpreter" relationship="REALIZATION">
+      <point x="14.999999999999943" y="60.5" />
+      <point x="321.0" y="209.0" />
+      <point x="1285.5" y="209.0" />
+      <point x="1285.5" y="-133.5" />
+      <point x="166.0" y="0.0" />
+    </edge>
+    <edge source="lib.xmlParser" target="lib.xmlParser" relationship="TO_ONE">
+      <point x="10.5" y="72.0" />
+      <point x="594.0" y="411.9646618687259" />
+      <point x="759.0" y="411.9646618687259" />
+      <point x="759.0" y="376.0" />
+      <point x="137.5" y="51.0" />
+    </edge>
+    <edge source="plugin.Delta" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="0.0" y="115.5" />
+      <point x="-46.0" y="231.0" />
+      <point x="254.0" y="231.0" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="plugin.Aspect" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="-5.6843418860808015E-14" y="60.5" />
+      <point x="306.0" y="231.0" />
+      <point x="254.0" y="231.0" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="main_engine" target="lib.JavaFileManager" relationship="DEPENDENCY">
+      <point x="0.0" y="-60.0" />
+      <point x="895.0" y="242.0" />
+      <point x="254.0" y="242.0" />
+      <point x="0.0" y="-149.0" />
+    </edge>
+    <edge source="lib.JavaFileManager" target="lib.JavaFileManager" relationship="CREATE">
+      <point x="-137.37813127413156" y="145.94369482625427" />
+      <point x="116.62186872586844" y="583.275584864865" />
+      <point x="191.78601575289576" y="583.275584864865" />
+      <point x="191.78601575289576" y="543.1157918146712" />
+      <point x="-69.18400123552155" y="141.11579181467118" />
+    </edge>
+    <edge source="plugin.SpringPreprocessor" target="Interfaces.Interpreter" relationship="REALIZATION">
+      <point x="-15.0" y="93.5" />
+      <point x="689.0" y="209.0" />
+      <point x="1285.5" y="209.0" />
+      <point x="1285.5" y="-133.5" />
+      <point x="166.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.43438155136268364" showDependencies="true" x="968.3516012664093" y="409.63262449420847" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
