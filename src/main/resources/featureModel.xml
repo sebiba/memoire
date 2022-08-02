@@ -2,7 +2,6 @@
 <FeatureModel xmlns:th="http://www.w3.org/1999/xhtml">
     <SpringAspect name="logging" url="">
         <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
-        <class name="DBManagerAspect" />
     </SpringAspect>
     <SpringPreprocessor name="SGBD" url="">
         <file path="\src\main\resources\application.properties" />

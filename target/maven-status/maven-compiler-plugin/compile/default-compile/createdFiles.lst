@@ -1,13 +1,12 @@
+interfaces\Interpreter.class
 exceptions\StructureNotSupportedException.class
-Interfaces\Interpreter.class
 main_engine.class
-plugin\Aspect.class
+plugin\SpringAspect.class
 exceptions\RequirementException.class
-lib\xmlParser.class
+META-INF\services\interfaces.Interpreter
 plugin\Delta.class
 lib\compileManager.class
 plugin\Plugin.class
 lib\Importer.class
-META-INF\services\Interfaces.Interpreter
 lib\JavaFileManager.class
 plugin\SpringPreprocessor.class

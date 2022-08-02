@@ -5,8 +5,8 @@
         <class name="DBManagerAspect" />
     </SpringAspect>
     <SpringPreprocessor name="SGBD" require="compte">
-        <file path="\src\main\resources\application.properties" />
-        <var datasource="mysql" />
+        <file paths="\src\main\resources\application.properties" />
+        <varx datasource="mysql" />
     </SpringPreprocessor>
     <Delta name="compte" require="recherche">
         <addFile>

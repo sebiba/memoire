@@ -31,16 +31,12 @@ public class JavaFileManager {
         }
         return instance;
     }
-    public boolean isFileInProjectDirectory(String fileName){
+    public boolean isFileInProjectDirectory(String fileName) throws IllegalArgumentException{
         File root = new File(tempPath);
-        try {
-            Collection<File> files = FileUtils.listFiles(root, null, true);
-            for (File o : files) {
-                if (o.getName().contains(Paths.get(fileName).getFileName().toString()))
-                    return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        Collection<File> files = FileUtils.listFiles(root, null, true);
+        for (File o : files) {
+            if (o.getName().contains(Paths.get(fileName).getFileName().toString()))
+                return true;
         }
         return false;
     }
@@ -57,65 +53,55 @@ public class JavaFileManager {
      * @param path String path to file to read
      * @return List<String> list of lines from the file
      */
-    public List<String> getFileContentAsLines(String path){
+    public List<String> getFileContentAsLines(String path) throws IOException{
         if(!path.startsWith("\\") && !tempPath.endsWith("\\")){
             tempPath = tempPath.concat("\\");
         }
         List<String> lines = new ArrayList<>();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(tempPath+path));
-            String line="";
-            while(line != null){
-                line = reader.readLine();
-                if(line!=null){
-                    lines.add(line);
-                }
+        BufferedReader reader = new BufferedReader(new FileReader(tempPath+path));
+        String line="";
+        while(line != null){
+            line = reader.readLine();
+            if(line!=null){
+                lines.add(line);
             }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        reader.close();
         return lines;
     }
 
-    public void saveListInFile(String path, List<String> lines){
-        try {
-            FileWriter writer = new FileWriter(tempPath+path);
-            for (String line : lines) {
-                writer.write(line + System.lineSeparator());
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void saveListInFile(String path, List<String> lines) throws IOException {
+        if(!path.startsWith("\\") && !tempPath.endsWith("\\")){
+            tempPath = tempPath.concat("\\");
         }
+        if(!new File(tempPath+path).exists()){
+            new File(tempPath+path).createNewFile();
+        }
+        FileWriter writer = new FileWriter(tempPath+path);
+        for (String line : lines) {
+            writer.write(line + System.lineSeparator());
+        }
+        writer.close();
     }
 
-    public void copyFileFrom(String path, String destination){
+    public void copyFileFrom(String path, String destination) throws IOException{
         File srcDir = new File(path);
         File destDir = new File(destination);
         try {
             FileUtils.copyDirectory(srcDir, destDir);
         } catch (IOException e) {
-            try {
-                if(srcDir.isFile() && destDir.isDirectory()) {
-                    FileUtils.copyFile(srcDir, new File(destDir + "\\" + srcDir.getName()));
-                }else{
-                    FileUtils.copyFile(srcDir, destDir);
-                }
-            } catch (IOException x) {
-                x.printStackTrace();
+            if(srcDir.isFile() && destDir.isDirectory()) {
+                FileUtils.copyFile(srcDir, new File(destDir + "\\" + srcDir.getName()));
+            }else{
+                FileUtils.copyFile(srcDir, destDir);
             }
         }
     }
 
-    public Document getXmlFile(String path){
+    public Document getXmlFile(String path) throws IOException, JDOMException {
         SAXBuilder sxb = new SAXBuilder();
         Document document = null;
-        try {
-            document = sxb.build(new File(path));
-        } catch (JDOMException | IOException e) {
-            e.printStackTrace();
-        }
+        document = sxb.build(new File(path));
         return document;
     }
 

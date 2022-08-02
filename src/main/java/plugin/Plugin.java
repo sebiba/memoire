@@ -7,6 +7,7 @@ import lib.JavaFileManager;
 import org.jdom2.Element;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -19,12 +20,13 @@ public class Plugin implements Interpreter {
     public String getName() {return "Plugin";}
     @Override
     public boolean checConstruct(Element node) {
+        List<Boolean> result = new ArrayList<>();
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
-                return child.getAttributeValue("path").isEmpty();
+                result.add(!child.getAttributeValue("path").isEmpty());
             }
         }
-        return false;
+        return !result.contains(false) && result.size()>0;
     }
     @Override
     public void construct(Element node, Map<String, String> importer) {
@@ -62,7 +64,11 @@ public class Plugin implements Interpreter {
                 file = "\\".concat(file);
             }
             //TODO: change as in Aspect.java
-            JavaFileManager.getInstance().copyFileFrom(director + "\\" + this.remote + file, localDirect + file);
+            try {
+                JavaFileManager.getInstance().copyFileFrom(director + "\\" + this.remote + file, localDirect + file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -22,12 +23,58 @@ public class Delta implements Interpreter {
     }
     @Override
     public boolean checConstruct(Element node) {
-        String deltaName = node.getAttribute("name").getValue();
-        return deltaName != null;
+        try{
+            node.getAttribute("name");
+        }catch (NullPointerException  e){
+            return false;
+        }
+        List<Boolean> test = new ArrayList<>();
+        for (Element type:node.getChildren()) {
+            switch (type.getName()){
+                case "addFile":
+                case "deleteFile":
+                    test.add(this.checAddSuppStructure(type));
+                    break;
+                case "modif":
+                    test.add(this.checModifStructure(type));
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return test.size() == node.getChildren().size();
+    }
+    private boolean checAddSuppStructure(Element adder){
+        for (Element file:adder.getChildren()) {
+            if(!Objects.equals(file.getName(), "file"))return false;
+            try{
+                file.getAttribute("path");
+            }catch (NullPointerException e){
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean checModifStructure(Element adder){
+        for (Element file:adder.getChildren()) {
+            if(!Objects.equals(file.getName(), "file"))return false;
+            try{
+                file.getAttribute("path");
+            }catch (NullPointerException e){
+                return false;
+            }
+            try{
+                file.getAttribute("type");
+            }catch (NullPointerException e){
+                return false;
+            }
+            if(file.getChildren().size() == 0) return false;
+        }
+        return true;
     }
 
     @Override
-    public void checImport(String localDirect, Map<String, String> importer, String file) {
+    public void checImport(String localDirect, Map<String, String> importer, String file) throws IOException {
         List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
@@ -79,18 +126,22 @@ public class Delta implements Interpreter {
 
     private void fileModif(Element cat) {
         for (Element addFile:cat.getChildren()) {
-            switch(addFile.getAttributeValue("type")){
-                case "java":
-                    this.javaAdder(addFile);
-                    break;
-                case "html":
-                    this.htmlAdder(addFile);
-                    break;
+            try {
+                switch (addFile.getAttributeValue("type")) {
+                    case "java":
+                        this.javaAdder(addFile);
+                        break;
+                    case "html":
+                        this.htmlAdder(addFile);
+                        break;
+                }
+            }catch (IOException e){
+                e.printStackTrace();
             }
         }
     }
 
-    private void htmlAdder(Element addFile) {
+    private void htmlAdder(Element addFile) throws IOException {
         List<String> fileContent = JavaFileManager.getInstance().getFileContentAsLines(addFile.getAttributeValue("path"));
         for (Element add:addFile.getChildren()) {
             Document htmlParse = Jsoup.parse(String.join("\n",fileContent));
@@ -99,7 +150,7 @@ public class Delta implements Interpreter {
         }
     }
 
-    private void javaAdder(Element addFile) {
+    private void javaAdder(Element addFile) throws IOException {
         List<String> fileContent = JavaFileManager.getInstance().getFileContentAsLines(addFile.getAttributeValue("path"));
         //loop from EOF to catch Class end
         /*assomption file end with 1 class end*/
@@ -117,9 +168,13 @@ public class Delta implements Interpreter {
     }
     private void fileAdder(Element cat, Map<String, String> importer){
         for (Element file:cat.getChildren()) {
-            this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
-                            importer,
-                            file.getAttributeValue("path"));
+            try {
+                this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
+                                importer,
+                                file.getAttributeValue("path"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

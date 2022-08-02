@@ -5,7 +5,6 @@
     <SpringPreprocessor name="SGBD">
         <var datasource="mysql" />
     </SpringPreprocessor>
-    <Delta name="liker" />
     <Delta name="compte" />
     <Plugin name="recherche" />
 </Configuration>

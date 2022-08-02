@@ -4,10 +4,9 @@ import exceptions.StructureNotSupportedException;
 import lib.Importer;
 import lib.JavaFileManager;
 import lib.compileManager;
-import lib.xmlParser;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +17,12 @@ public class main_engine {
             showHelp();
             return;
         }
-        Document document = JavaFileManager.getInstance().getXmlFile(args[0]);
+        Document document = null;
+        try {
+            document = JavaFileManager.getInstance().getXmlFile(args[0]);
+        } catch (IOException | JDOMException e) {
+            e.printStackTrace();
+        }
         assert document != null;
         Element racine = document.getRootElement();
         switch (racine.getName()){
@@ -30,7 +34,12 @@ public class main_engine {
                 }
                 break;
             case "FeatureModel":
-                checFeatureModel(racine);
+                try {
+                    checFeatureModel(racine);
+                    System.out.println(args[0]+ " has a supported structure.");
+                } catch (StructureNotSupportedException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
@@ -56,10 +65,14 @@ public class main_engine {
             String url = importer.getRemoteImport().substring(0,importer.getRemoteImport().lastIndexOf("/"));
             gitBranches = JavaFileManager.getInstance().getBranchesFromGitRepo(url);
         }
-        if(!importer.checSelection(racine)){
-            throw new RequirementException("Erreur lors de la verification des requirements");
+        try {
+            if(!importer.checSelection(racine)){
+                throw new RequirementException("Erreur lors de la verification des requirements");
+            }
+        } catch (IOException | JDOMException e) {
+            throw new RuntimeException(e);
         }
-        for (Element node: xmlParser.getInstance().getChildOf(racine)) {
+        for (Element node: racine.getChildren()) {
             //load import attr in map to pass to each variant
             if(!node.getName().equals("import")){
                 //apply every plugin to corresponding variant
@@ -93,8 +106,14 @@ public class main_engine {
 
         }
     }
-    public static void checFeatureModel(Element racine){
-
+    public static void checFeatureModel(Element racine) throws StructureNotSupportedException {
+        Map<String, Interpreter> plugins = loadPlugins();
+        for (Element variant:racine.getChildren()) {
+            if(!plugins.get(variant.getName()).checConstruct(variant)){
+                throw new StructureNotSupportedException("the variant \""+variant.getName()+"\" with the name \""+
+                variant.getAttributeValue("name")+"\" has an unsupported structure.");
+            }
+        }
     }
 
     /**

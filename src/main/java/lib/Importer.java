@@ -7,11 +7,14 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Importer {
@@ -74,21 +77,25 @@ public class Importer {
         }
     }
     public boolean isAnUrl(String url){
-        try {
-            if(!url.startsWith("http")){
-                url = "http://"+url;
-            }
-            new URL(url).toURI();
-            return true;
-        }catch (Exception e) {
+        final String URL_REGEX =
+            "^(((https?|ftps?|)://)(%[0-9A-Fa-f]{2}|[-()_.!~*';/?:@&=+$,A-Za-z0-9])+)" +
+                "([).!';/?:,][[:blank:]])?$";
+
+        final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+        if (url == null) {
             return false;
+        } else if (!(url.startsWith("http")||url.startsWith("ftp"))) {
+            url = "http://"+url;
         }
+
+        Matcher matcher = URL_PATTERN.matcher(url);
+        return matcher.matches();
     }
 //region get/set
     public String getDirectory(){
         return this.directory;
     }
-    public Element getFeatureModelFor(String name) {
+    public Element getFeatureModelFor(String name) throws IOException, JDOMException {
         Element feature;
         Document xml = JavaFileManager.getInstance().getXmlFile(this.localImport);
         List<Element> features = xml.getRootElement().getChildren();
@@ -113,7 +120,7 @@ public class Importer {
         return importer;
     }
 //endregion
-    public boolean checSelection(Element racine) {
+    public boolean checSelection(Element racine) throws IOException, JDOMException {
         List<Boolean> requires = new ArrayList<>();
         Document featureModel = JavaFileManager.getInstance().getXmlFile(localImport);
         for (Element variant: featureModel.getRootElement().getChildren()) {

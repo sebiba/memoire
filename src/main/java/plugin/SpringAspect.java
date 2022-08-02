@@ -4,7 +4,6 @@ import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Element;
 
 import java.io.File;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 
 
 @AutoService(Interpreter.class)
-public class Aspect implements Interpreter {
+public class SpringAspect implements Interpreter {
     private String remote =null;
 
     @Override
@@ -27,15 +26,13 @@ public class Aspect implements Interpreter {
     public boolean checConstruct(Element node) {
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
-                return child.getAttributeValue("path").isEmpty();
-            } else if (Objects.equals(child.getName(), "class")) {
-                return child.getAttributeValue("name").isEmpty();
+                return !child.getAttributeValue("path").isEmpty();
             }
         }
         return false;
     }
     @Override
-    public void checImport(String localDirect, Map<String, String> importer, String file) {
+    public void checImport(String localDirect, Map<String, String> importer, String file) throws IOException {
         List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
@@ -61,9 +58,13 @@ public class Aspect implements Interpreter {
         }
         for (Element child : node.getChildren()) {
             if (Objects.equals(child.getName(), "file")) {
-                this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
-                                importer,
-                                child.getAttributeValue("path"));
+                try {
+                    this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
+                                    importer,
+                                    child.getAttributeValue("path"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

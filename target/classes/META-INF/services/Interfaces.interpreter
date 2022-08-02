@@ -1,4 +1,4 @@
-plugin.Aspect
 plugin.Delta
 plugin.Plugin
+plugin.SpringAspect
 plugin.SpringPreprocessor

@@ -8,6 +8,7 @@ import org.jdom2.Element;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -22,12 +23,16 @@ public class SpringPreprocessor implements Interpreter {
     }
     @Override
     public boolean checConstruct(Element node) {
+        boolean hasvar = false;
         for (Element child:node.getChildren()) {
             if(Objects.equals(child.getName(), "file")){
                 this.file = child.getAttributeValue("path");
             }
+            if(Objects.equals(child.getName(), "var")){
+                hasvar = true;
+            }
         }
-        return file != null;
+        return file != null && hasvar;
     }
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) {
@@ -64,10 +69,8 @@ public class SpringPreprocessor implements Interpreter {
                         this.directiveHandler(lineIf, lineElse, lineEndIf, file, lines);
                     }
                 }
-            } catch (ClassCastException e){
+            } catch (Exception e){
                 e.printStackTrace();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -81,7 +84,7 @@ public class SpringPreprocessor implements Interpreter {
         }
     }
 
-    private void directiveHandler(int lineIf, int lineElse, int lineEndIf, Element file, List<String>lines) throws ScriptException {
+    private void directiveHandler(int lineIf, int lineElse, int lineEndIf, Element file, List<String>lines) throws ScriptException, IOException {
         //ELSE statement found in file
         if (lineElse != -1 && lineElse < lineEndIf) {
             //IF statement is true AND ELSE statement founded
