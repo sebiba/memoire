@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FeatureModel xmlns:th="http://www.w3.org/1999/xhtml">
+    <SpringAspect name="logging" require="java">
+        <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
+        <class name="DBManagerAspect" />
+    </SpringAspect>
+    <SpringPreprocessor name="SGBD" require="compte">
+        <file path="\src\main\resources\application.properties" />
+        <var datasource="mysql" />
+    </SpringPreprocessor>
+    <Delta name="compte" require="recherche">
+        <addFile>
+            <file path="src/main/java/com/example/testspring/Model/User.java" />
+            <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
+        </addFile>
+    </Delta>
+    <Plugin name="recherche" require="null">
+        <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
+        <file path="src/main/java/com/example/testspring/Interface/PluginInterface.java" />
+        <file path="src/main/resources/static/rechercheNavBar.html" />
+    </Plugin>
+</FeatureModel>

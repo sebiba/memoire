@@ -1,5 +1,7 @@
 package lib;
 
+import exceptions.RequirementException;
+import exceptions.StructureNotSupportedException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.jdom2.Attribute;
@@ -9,10 +11,7 @@ import org.jdom2.Element;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Importer {
@@ -23,8 +22,11 @@ public class Importer {
     public Importer() {
 
     }
-    public Importer(Element node) {
+    public Importer(Element node) throws StructureNotSupportedException {
         List<Element> fileImport = node.getChildren().stream().filter(x->x.getName().equals("import")).collect(Collectors.toList());
+        if(fileImport.size() == 0){
+            throw new StructureNotSupportedException("structure du fichier non supportée.");
+        }
         for (Element imp:fileImport) {
             for (Attribute attr: imp.getAttributes()) {
                 this.copy(attr.getValue(), this.directory);
@@ -42,12 +44,8 @@ public class Importer {
     }
     public void copy(String path, String destination){
         if(this.isAnUrl(path)){
-            try {
-                this.isGitRepo = true;
-                JavaFileManager.getInstance().downloadBrancheFromGit(path);
-            } catch (TransportException e) {
-                throw new RuntimeException(e);
-            }
+            this.isGitRepo = true;
+            JavaFileManager.getInstance().downloadBrancheFromGit(path);
         }else{
             File srcDir = new File(path);
             if(srcDir.isFile() && destination.equals(this.directory)){
@@ -77,6 +75,9 @@ public class Importer {
     }
     public boolean isAnUrl(String url){
         try {
+            if(!url.startsWith("http")){
+                url = "http://"+url;
+            }
             new URL(url).toURI();
             return true;
         }catch (Exception e) {

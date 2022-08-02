@@ -3,6 +3,7 @@ import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
 import lib.Importer;
 import lib.JavaFileManager;
+import lib.compileManager;
 import lib.xmlParser;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jdom2.Document;
@@ -24,7 +25,7 @@ public class main_engine {
             case "Configuration":
                 try {
                     buildConfig(racine, args.length > 1 && Boolean.parseBoolean(args[1]));
-                }catch (RequirementException e){
+                }catch (RequirementException | StructureNotSupportedException e){
                     e.printStackTrace();
                 }
                 break;
@@ -47,7 +48,7 @@ public class main_engine {
      * build de desired configuration corresponding to the xml file
      * @param racine root xml element from the xml file
      */
-    public static void buildConfig(Element racine, Boolean withoutTest) throws RequirementException {
+    public static void buildConfig(Element racine, Boolean withoutTest) throws RequirementException, StructureNotSupportedException {
         Map<String, Interpreter> plugins = loadPlugins();
         Importer importer = new Importer(racine);
         List<String> gitBranches = new ArrayList<>();
@@ -80,14 +81,17 @@ public class main_engine {
         }
         //TODO: make preprocessor juste befor compile
         System.out.println("configuration assemblée");
-        //compileManager.getInstance().maven_powerShell("temp", "compile");
+        compileManager.getInstance().maven_powerShell("temp", "compile");
         System.out.println("compilation effectuée");
         if(withoutTest){
-            //compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
+            compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
         }else{
-            //compileManager.getInstance().maven_powerShell("temp", "package");
+            compileManager.getInstance().maven_powerShell("temp", "package");
         }
         System.out.println("packagation effectuée");
+        if(JavaFileManager.getInstance().isFileInProjectDirectory("Dockerfile")){
+
+        }
     }
     public static void checFeatureModel(Element racine){
 
