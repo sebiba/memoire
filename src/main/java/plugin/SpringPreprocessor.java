@@ -1,6 +1,6 @@
 package plugin;
 
-import interfaces.Interpreter;
+import Interpreter;
 import com.google.auto.service.AutoService;
 import org.jdom2.Attribute;
 import org.jdom2.Element;

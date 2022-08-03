@@ -1,7 +1,7 @@
 package plugin;
 
-import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
+import Interpreter;
 import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Element;
@@ -79,11 +79,14 @@ public class Delta implements Interpreter {
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
         if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)) {
-            if(!this.remote.startsWith("\\") && !file.endsWith("\\")){
+            if(!this.remote.endsWith("\\") && !file.startsWith("\\")){
                 file = "\\".concat(file);
             }
-            //TODO:change as in Aspect.java
-            JavaFileManager.getInstance().copyFileFrom(director + "\\" + this.remote + file, localDirect + file);
+            if(new Importer().isAnUrl(this.remote)){
+                JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+file, localDirect+file);
+            }else{
+                JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
+            }
         }
     }
 
@@ -115,7 +118,7 @@ public class Delta implements Interpreter {
     }
 
     @Override
-    public void setConfigFile(Element node) {
+    public void setConfigFile(Element featureModel) {
     }
 
     private void fileDeleter(Element cat) {

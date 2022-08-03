@@ -4,14 +4,11 @@ import com.profesorfalken.jpowershell.PowerShell;
 import com.profesorfalken.jpowershell.PowerShellNotAvailableException;
 import com.profesorfalken.jpowershell.PowerShellResponse;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class compileManager {
-    private static compileManager instance = null;
-    public static compileManager getInstance(){
+public class CompileManager {
+    private static CompileManager instance = null;
+    public static CompileManager getInstance(){
         if (instance == null){
-            instance = new compileManager();
+            instance = new CompileManager();
         }
         return instance;
     }

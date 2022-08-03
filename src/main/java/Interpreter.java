@@ -1,5 +1,3 @@
-package interfaces;
-
 import org.jdom2.Element;
 
 import java.io.IOException;
@@ -11,7 +9,7 @@ public interface Interpreter {
 
     void checImport(String localDirect, Map<String, String> importer, String file) throws IOException;
 
-    void construct(Element node, Map<String, String> importer);
+    void construct(Element featureModel, Map<String, String> importer);
 
-    void setConfigFile(Element node);
+    void setConfigFile(Element Configuration);
 }

@@ -1,9 +1,8 @@
-import interfaces.Interpreter;
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
+import lib.CompileManager;
 import lib.Importer;
 import lib.JavaFileManager;
-import lib.compileManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -37,7 +36,7 @@ public class main_engine {
                 try {
                     checFeatureModel(racine);
                     System.out.println(args[0]+ " has a supported structure.");
-                } catch (StructureNotSupportedException e) {
+                } catch (StructureNotSupportedException | NoSuchFieldException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -58,7 +57,7 @@ public class main_engine {
      * @param racine root xml element from the xml file
      */
     public static void buildConfig(Element racine, Boolean withoutTest) throws RequirementException, StructureNotSupportedException {
-        Map<String, Interpreter> plugins = loadPlugins();
+        Map<String, Interpreter> pluginsList = loadPlugins();
         Importer importer = new Importer(racine);
         List<String> gitBranches = new ArrayList<>();
         if(importer.isSourceGitRepo()){
@@ -83,33 +82,32 @@ public class main_engine {
                         }
                     }
                     if(racine.getName().equals("Configuration") && node.getChildren().size()>0){
-                        plugins.get(node.getName()).setConfigFile(node);
+                        pluginsList.get(node.getName()).setConfigFile(node);
                     }
-                    plugins.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
+                    pluginsList.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
                                 importer.getImport());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
         }
-        //TODO: make preprocessor juste befor compile
         System.out.println("configuration assemblée");
-        compileManager.getInstance().maven_powerShell("temp", "compile");
+        CompileManager.getInstance().maven_powerShell("temp", "compile");
         System.out.println("compilation effectuée");
         if(withoutTest){
-            compileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
+            CompileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
         }else{
-            compileManager.getInstance().maven_powerShell("temp", "package");
+            CompileManager.getInstance().maven_powerShell("temp", "package");
         }
         System.out.println("packagation effectuée");
-        if(JavaFileManager.getInstance().isFileInProjectDirectory("Dockerfile")){
-
-        }
     }
-    public static void checFeatureModel(Element racine) throws StructureNotSupportedException {
+    public static void checFeatureModel(Element racine) throws StructureNotSupportedException, NoSuchFieldException {
         Map<String, Interpreter> plugins = loadPlugins();
         for (Element variant:racine.getChildren()) {
-            if(!plugins.get(variant.getName()).checConstruct(variant)){
+            if(!plugins.keySet().contains(variant.getName())){
+                throw new NoSuchFieldException("The featureModel call a plugin called \""+variant.getName()+"\" but no plugin with that name is registred");
+            }
+            else if(!plugins.get(variant.getName()).checConstruct(variant)){
                 throw new StructureNotSupportedException("the variant \""+variant.getName()+"\" with the name \""+
                 variant.getAttributeValue("name")+"\" has an unsupported structure.");
             }
@@ -121,11 +119,21 @@ public class main_engine {
      * @return Map<String, interpreter> plugin's name and the plugin
      */
     static public Map<String, Interpreter> loadPlugins(){
-        ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
+        PluginLoader pluginLoader = new PluginLoader();
+        Map<String, Interpreter>pluginsList = new HashMap<>();
+        try {
+            for (Interpreter plugin:pluginLoader.loadAllPlugins()) {
+                pluginsList.put(plugin.getName(),plugin);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return pluginsList;
+        /*ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
         Map<String, Interpreter> services = new HashMap<>();
         for (Interpreter service : serviceLoader) {
             services.put(service.getName(), service);
         }
-        return services;
+        return services;*/
     }
 }

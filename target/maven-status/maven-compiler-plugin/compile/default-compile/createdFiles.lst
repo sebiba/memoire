@@ -4,9 +4,11 @@ main_engine.class
 plugin\SpringAspect.class
 exceptions\RequirementException.class
 META-INF\services\interfaces.Interpreter
+lib\CompileManager.class
 plugin\Delta.class
-lib\compileManager.class
+Interpreter.class
 plugin\Plugin.class
 lib\Importer.class
 lib\JavaFileManager.class
 plugin\SpringPreprocessor.class
+PluginLoader.class

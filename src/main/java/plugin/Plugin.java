@@ -1,7 +1,7 @@
 package plugin;
 
-import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
+import Interpreter;
 import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Element;
@@ -42,32 +42,35 @@ public class Plugin implements Interpreter {
         }
         for (Element child : node.getChildren()) {
             if (Objects.equals(child.getName(), "file")) {
-                this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
-                                importer,
-                                child.getAttributeValue("path"));
+                try {
+                    this.checImport(new File(importer.keySet().toArray()[0].toString()).getParent(),
+                                    importer,
+                                    child.getAttributeValue("path"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
     @Override
-    public void setConfigFile(Element node) {
+    public void setConfigFile(Element featureModel) {
 
     }
 
     @Override
-    public void checImport(String localDirect, Map<String, String> importer, String file) {
+    public void checImport(String localDirect, Map<String, String> importer, String file) throws IOException {
         List<String> path = List.of(new File(String.valueOf(importer.values().toArray()[0])).getParent()
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
         if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)) {
-            if(!this.remote.startsWith("\\") && !file.endsWith("\\")){
+            if(!this.remote.endsWith("\\") && !file.startsWith("\\")){
                 file = "\\".concat(file);
             }
-            //TODO: change as in Aspect.java
-            try {
-                JavaFileManager.getInstance().copyFileFrom(director + "\\" + this.remote + file, localDirect + file);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(new Importer().isAnUrl(this.remote)){
+                JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+file, localDirect+file);
+            }else{
+                JavaFileManager.getInstance().copyFileFrom(director+"\\"+this.remote+file, localDirect+file);
             }
         }
     }

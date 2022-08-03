@@ -78,9 +78,7 @@ public class Importer {
     }
     public boolean isAnUrl(String url){
         final String URL_REGEX =
-            "^(((https?|ftps?|)://)(%[0-9A-Fa-f]{2}|[-()_.!~*';/?:@&=+$,A-Za-z0-9])+)" +
-                "([).!';/?:,][[:blank:]])?$";
-
+            "^([-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?)";
         final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
         if (url == null) {
             return false;

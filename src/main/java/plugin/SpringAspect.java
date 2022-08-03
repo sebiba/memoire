@@ -1,6 +1,6 @@
 package plugin;
 
-import interfaces.Interpreter;
+import Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -37,6 +37,9 @@ public class SpringAspect implements Interpreter {
             .split(Pattern.quote(System.getProperty("file.separator"))));
         String director = String.join("\\",path.subList(0, path.size()-1));
         if(!JavaFileManager.getInstance().isFileInProjectDirectory(file)){
+            if(!this.remote.endsWith("\\") && !file.startsWith("\\")){
+                file = "\\".concat(file);
+            }
             if(new Importer().isAnUrl(this.remote)){
                 JavaFileManager.getInstance().downloadFileFromGitTo(this.remote+file, localDirect+file);
             }else{
@@ -70,7 +73,7 @@ public class SpringAspect implements Interpreter {
     }
 
     @Override
-    public void setConfigFile(Element node) {
+    public void setConfigFile(Element featureModel) {
 
     }
 }
