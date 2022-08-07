@@ -133,17 +133,12 @@ public class JavaFileManager {
         return  new SAXBuilder().build(new File(path));
     }
 
-    public boolean applyXSD(String xsdPath, String xmlPath){
-        try {
-            SchemaFactory factory =
-                SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new File(xsdPath));
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(new File(xmlPath)));
-        } catch (IOException | SAXException e) {
-            System.out.println("Exception: "+e.getMessage());
-            return false;
-        }
+    public boolean applyXSD(String xsdPath, String xmlPath) throws IOException, SAXException {
+        SchemaFactory factory =
+            SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(new File(xsdPath));
+        Validator validator = schema.newValidator();
+        validator.validate(new StreamSource(new File(xmlPath)));
         return true;
     }
     public void buildXSDFile(String content, String file) throws IOException {

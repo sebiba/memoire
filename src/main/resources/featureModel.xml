@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FeatureModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test.xsd">
+<FeatureModel xmlns:th="http://www.w3.org/1999/xhtml">
     <SpringAspect name="logging">
         <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
     </SpringAspect>
@@ -43,11 +43,11 @@
             </file>
             <file type="html" path="src/main/resources/templates/bibliotheque.html">
                 <add endOf="detail">
-                    <!--<form id="likerForm" action="#" th:action="@{/bib/like}" method="post">
+                    <form id="likerForm" action="#" th:action="@{/bib/like}" method="post">
                         <input type="hidden" name="ean" th:value="${productDetail.ean}"/>
                         <p>Nom: <input type="text" name="name"/></p>
                         <p><input type="submit" value="Submit" /></p>
-                    </form>-->
+                    </form>
                 </add>
             </file>
         </modif>

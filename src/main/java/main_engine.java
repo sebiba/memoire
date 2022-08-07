@@ -6,6 +6,7 @@ import lib.JavaFileManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +38,12 @@ public class main_engine {
                 try {
                     checFeatureModel(racine, args[0]);
                     System.out.println(args[0]+ " has a supported structure.");
-                } catch (StructureNotSupportedException | NoSuchFieldException | IOException e) {
+                } catch (StructureNotSupportedException | NoSuchFieldException | IOException | SAXException e) {
                     e.printStackTrace();
                 }
+                break;
+            default:
+                System.out.println(args[0]+ " has wrong root element");
                 break;
         }
     }
@@ -102,7 +106,7 @@ public class main_engine {
         }*/
         System.out.println("packagation effectuée");
     }
-    public static void checFeatureModel(Element racine, String featureModelPath) throws StructureNotSupportedException, NoSuchFieldException, IOException {
+    public static void checFeatureModel(Element racine, String featureModelPath) throws StructureNotSupportedException, NoSuchFieldException, IOException, SAXException {
         Map<String, Interpreter> plugins = loadPlugins();
         String xsdFile = "src/main/resources/used.xsd";
         JavaFileManager.getInstance().copyFileFrom("src/main/resources/base.xsd", xsdFile);
@@ -115,14 +119,25 @@ public class main_engine {
                 variant.getAttributeValue("name")+"\" has an unsupported structure.");
             }
         }*/
+        List<String> variantName = new ArrayList<>();
         for (Element variant:racine.getChildren()) {
             if(!plugins.containsKey(variant.getName())){
                 throw new NoSuchFieldException("The featureModel call a plugin called \""+variant.getName()+"\" but no plugin with that name is registred");
             }
-            JavaFileManager.getInstance().buildXSDFile(plugins.get(variant.getName()).getxsdDeclaration(),xsdFile);
+            variantName.add(variant.getName());
         }
-        JavaFileManager.getInstance().applyXSD(xsdFile, featureModelPath);
-        new File(xsdFile).delete();
+        variantName.stream().distinct().forEach(name->{
+            try {
+                JavaFileManager.getInstance().buildXSDFile(plugins.get(name).getxsdDeclaration(),xsdFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        try {
+            JavaFileManager.getInstance().applyXSD(xsdFile, featureModelPath);
+        } finally {
+            new File(xsdFile).delete();
+        }
     }
 
     /**
