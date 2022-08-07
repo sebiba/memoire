@@ -1,6 +1,6 @@
 package plugin;
 
-import Interpreter;
+import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -9,6 +9,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 
@@ -22,17 +25,8 @@ public class SpringPreprocessor implements Interpreter {
         return "SpringPreprocessor";
     }
     @Override
-    public boolean checConstruct(Element node) {
-        boolean hasvar = false;
-        for (Element child:node.getChildren()) {
-            if(Objects.equals(child.getName(), "file")){
-                this.file = child.getAttributeValue("path");
-            }
-            if(Objects.equals(child.getName(), "var")){
-                hasvar = true;
-            }
-        }
-        return file != null && hasvar;
+    public String getxsdDeclaration() throws IOException {
+        return Files.readString(Path.of("src/main/resources/SpringPreprocessor.xsd.txt"), StandardCharsets.UTF_8);
     }
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) {

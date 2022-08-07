@@ -1,6 +1,5 @@
 package plugin;
 
-import lib.JavaFileManager;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,18 +14,13 @@ class DeltaTest {
     void test_checConstruct() {
         Delta test = new Delta();
         assertDoesNotThrow(()->
-            assertTrue(test.checConstruct(JavaFileManager.getInstance()
-                .getXmlFile("src/test/resources/featureModelOk.xml")
-                .getRootElement()
-                .getChild("Delta"))));
+            assertTrue(test.getxsdDeclaration()));
     }
     @Test
     void test_construct_False() {
         Delta test = new Delta();
         assertDoesNotThrow(()->
-            assertFalse(test.checConstruct(JavaFileManager.getInstance()
-                .getXmlFile("src/test/resources/configTest1.xml")
-                .getRootElement())));
+            assertFalse(test.getxsdDeclaration()));
     }
 
     @Test

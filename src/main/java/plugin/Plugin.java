@@ -1,13 +1,16 @@
 package plugin;
 
 import com.google.auto.service.AutoService;
-import Interpreter;
+import interfaces.Interpreter;
 import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -19,14 +22,8 @@ public class Plugin implements Interpreter {
     @Override
     public String getName() {return "Plugin";}
     @Override
-    public boolean checConstruct(Element node) {
-        List<Boolean> result = new ArrayList<>();
-        for (Element child:node.getChildren()) {
-            if(Objects.equals(child.getName(), "file")){
-                result.add(!child.getAttributeValue("path").isEmpty());
-            }
-        }
-        return !result.contains(false) && result.size()>0;
+    public String getxsdDeclaration() throws IOException {
+        return Files.readString(Path.of("src/main/resources/plugin.xsd.txt"), StandardCharsets.UTF_8);
     }
     @Override
     public void construct(Element node, Map<String, String> importer) {

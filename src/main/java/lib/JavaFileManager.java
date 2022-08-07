@@ -10,7 +10,13 @@ import org.eclipse.jgit.lib.Ref;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,7 +37,13 @@ public class JavaFileManager {
         }
         return instance;
     }
-    public boolean isFileInProjectDirectory(String fileName) throws IllegalArgumentException{
+
+    /**
+     * check if a file is in directory or subdirectory
+     * @param fileName String path of the file to look for
+     * @return true if the file is found false otherwise
+     */
+    public boolean isFileInProjectDirectory(String fileName){
         File root = new File(tempPath);
         Collection<File> files = FileUtils.listFiles(root, null, true);
         for (File o : files) {
@@ -70,6 +82,12 @@ public class JavaFileManager {
         return lines;
     }
 
+    /**
+     * save a list of String in a file create if does not exist
+     * @param path String path of the file where to save
+     * @param lines List<String> content to save in the file
+     * @throws IOException error while writing in the file
+     */
     public void saveListInFile(String path, List<String> lines) throws IOException {
         if(!path.startsWith("\\") && !tempPath.endsWith("\\")){
             tempPath = tempPath.concat("\\");
@@ -84,6 +102,12 @@ public class JavaFileManager {
         writer.close();
     }
 
+    /**
+     * copy a file from one path to another
+     * @param path String where the file start
+     * @param destination String where the file end. can be a directory path
+     * @throws IOException error while writing the file
+     */
     public void copyFileFrom(String path, String destination) throws IOException{
         File srcDir = new File(path);
         File destDir = new File(destination);
@@ -98,13 +122,55 @@ public class JavaFileManager {
         }
     }
 
+    /**
+     * get a JDOM XML Document from a xml file's path
+     * @param path String path to XML file
+     * @return Document containing the XML as a JDOM Element structure
+     * @throws IOException error while reading the file
+     * @throws JDOMException error while parsing xml
+     */
     public Document getXmlFile(String path) throws IOException, JDOMException {
-        SAXBuilder sxb = new SAXBuilder();
-        Document document = null;
-        document = sxb.build(new File(path));
-        return document;
+        return  new SAXBuilder().build(new File(path));
     }
 
+    public boolean applyXSD(String xsdPath, String xmlPath){
+        try {
+            SchemaFactory factory =
+                SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new File(xsdPath));
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(new File(xmlPath)));
+        } catch (IOException | SAXException e) {
+            System.out.println("Exception: "+e.getMessage());
+            return false;
+        }
+        return true;
+    }
+    public void buildXSDFile(String content, String file) throws IOException {
+        List<String> xsdFile = new ArrayList<>();
+        try(BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line="";
+            while(line != null){
+                line = reader.readLine();
+                if(line!=null){
+                    xsdFile.add(line);
+                }
+            }
+        }
+        int choiceLine = xsdFile.indexOf("\t<xs:choice maxOccurs=\"unbounded\">");
+        xsdFile.add(choiceLine+1, content);
+        try(FileWriter writer = new FileWriter(file)){
+            for (String line : xsdFile) {
+                writer.write(line + System.lineSeparator());
+            }
+        }
+    }
+
+
+    /**
+     * cloning Git branche from url
+     * @param url String url from git repository
+     */
     public void downloadBrancheFromGit(String url){
         try {
             System.out.println("Cloning "+url+" into "+tempPath);
@@ -118,7 +184,7 @@ public class JavaFileManager {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();
         } catch (JGitInternalException e){
-            //Destination path "temp" already exists and is not an empty directory
+            //Destination path "build" already exists and is not an empty directory
             if(deleteAllFileFrom(tempPath)){
                 this.downloadBrancheFromGit(url);
             }else{
@@ -127,6 +193,11 @@ public class JavaFileManager {
         }
     }
 
+    /**
+     * download one file from a git repository
+     * @param urlGit String url of the file in a specific branche
+     * @param path String path to where download the file
+     */
     public void downloadFileFromGitTo(String urlGit, String path) {
         URL url = null;
         urlGit = urlGit.replace(":\\", ":\\\\");
@@ -160,6 +231,11 @@ public class JavaFileManager {
         }
     }
 
+    /**
+     *delete all file from a specific folder
+     * @param tempPath String path to the folder to delete
+     * @return true if succeed false otherwise
+     */
     private boolean deleteAllFileFrom(String tempPath) {
         File[] allContents = new File(tempPath).listFiles();
         if (allContents != null) {
@@ -170,6 +246,11 @@ public class JavaFileManager {
         return new File(tempPath).delete();
     }
 
+    /**
+     * get all branches from git repository
+     * @param url String url from git repository
+     * @return List<String> names of all the existing branches
+     */
     public List<String> getBranchesFromGitRepo(String url){
         Collection<Ref> refs;
         List<String> branches = new ArrayList<>();

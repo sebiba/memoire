@@ -1,15 +1,17 @@
 package plugin;
 
 import com.google.auto.service.AutoService;
-import Interpreter;
+import interfaces.Interpreter;
 import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Element;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -22,27 +24,8 @@ public class Delta implements Interpreter {
         return "Delta";
     }
     @Override
-    public boolean checConstruct(Element node) {
-        try{
-            node.getAttribute("name");
-        }catch (NullPointerException  e){
-            return false;
-        }
-        List<Boolean> test = new ArrayList<>();
-        for (Element type:node.getChildren()) {
-            switch (type.getName()){
-                case "addFile":
-                case "deleteFile":
-                    test.add(this.checAddSuppStructure(type));
-                    break;
-                case "modif":
-                    test.add(this.checModifStructure(type));
-                    break;
-                default:
-                    return false;
-            }
-        }
-        return test.size() == node.getChildren().size();
+    public String getxsdDeclaration() throws IOException {
+        return Files.readString(Path.of("src/main/resources/delta.xsd.txt"), StandardCharsets.UTF_8);
     }
     private boolean checAddSuppStructure(Element adder){
         for (Element file:adder.getChildren()) {

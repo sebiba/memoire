@@ -30,6 +30,11 @@ public class Importer {
         if(fileImport.size() == 0){
             throw new StructureNotSupportedException("structure du fichier non supportée.");
         }
+        this.importMainFile(fileImport);
+        if(!this.isAnUrl(this.remoteImport) && new File(this.remoteImport).isFile())
+            this.copy(new File(this.remoteImport).getParent(), this.directory);
+    }
+    private void importMainFile(List<Element> fileImport){
         for (Element imp:fileImport) {
             for (Attribute attr: imp.getAttributes()) {
                 this.copy(attr.getValue(), this.directory);
@@ -42,8 +47,6 @@ public class Importer {
                 }
             }
         }
-        if(!this.isAnUrl(this.remoteImport) && new File(this.remoteImport).isFile())
-            this.copy(new File(this.remoteImport).getParent(), this.directory);
     }
     public void copy(String path, String destination){
         if(this.isAnUrl(path)){
@@ -118,17 +121,35 @@ public class Importer {
         return importer;
     }
 //endregion
+
+    /**
+     * go throw featureModel to know required constraints and cchec if constraints are respected
+     * @param racine XML Element Configuration
+     * @return true if all constraints are respected false otherwise
+     * @throws IOException error while opening featureModel's file
+     * @throws JDOMException error while parsing XML from featureModel
+     */
     public boolean checSelection(Element racine) throws IOException, JDOMException {
         List<Boolean> requires = new ArrayList<>();
         Document featureModel = JavaFileManager.getInstance().getXmlFile(localImport);
+        List<String> configVariant = racine.getChildren().stream().map(v->v.getAttributeValue("name")).collect(Collectors.toList());
         for (Element variant: featureModel.getRootElement().getChildren()) {
             if(variant.getAttributeValue("require") != null){
-                requires.add(this.isVariantSelected(racine, variant.getAttributeValue("require")));
+                if(configVariant.contains(variant.getAttributeValue("name"))){
+                    configVariant.remove(variant.getAttributeValue("name"));
+                    requires.add(this.isVariantSelected(racine, variant.getAttributeValue("require")));
+                }
             }
         }
         return !requires.contains(false);
     }
 
+    /**
+     * check if a variant of the product line is selected in the configuration.
+     * @param racine XML Element Configuration
+     * @param require String name of the variant to check
+     * @return true if require variant is selected false otherwise
+     */
     private Boolean isVariantSelected(Element racine, String require) {
         for (Element variant:racine.getChildren()) {
             if(!variant.getName().equals("import")){

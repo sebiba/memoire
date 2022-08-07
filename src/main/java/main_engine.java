@@ -1,12 +1,13 @@
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
-import lib.CompileManager;
 import lib.Importer;
+import interfaces.Interpreter;
 import lib.JavaFileManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -34,9 +35,9 @@ public class main_engine {
                 break;
             case "FeatureModel":
                 try {
-                    checFeatureModel(racine);
+                    checFeatureModel(racine, args[0]);
                     System.out.println(args[0]+ " has a supported structure.");
-                } catch (StructureNotSupportedException | NoSuchFieldException e) {
+                } catch (StructureNotSupportedException | NoSuchFieldException | IOException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -92,26 +93,36 @@ public class main_engine {
             }
         }
         System.out.println("configuration assemblée");
-        CompileManager.getInstance().maven_powerShell("temp", "compile");
+        //CompileManager.getInstance().maven_powerShell("temp", "compile");
         System.out.println("compilation effectuée");
-        if(withoutTest){
+        /*if(withoutTest){
             CompileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
         }else{
             CompileManager.getInstance().maven_powerShell("temp", "package");
-        }
+        }*/
         System.out.println("packagation effectuée");
     }
-    public static void checFeatureModel(Element racine) throws StructureNotSupportedException, NoSuchFieldException {
+    public static void checFeatureModel(Element racine, String featureModelPath) throws StructureNotSupportedException, NoSuchFieldException, IOException {
         Map<String, Interpreter> plugins = loadPlugins();
-        for (Element variant:racine.getChildren()) {
-            if(!plugins.keySet().contains(variant.getName())){
+        String xsdFile = "src/main/resources/used.xsd";
+        JavaFileManager.getInstance().copyFileFrom("src/main/resources/base.xsd", xsdFile);
+        /*for (Element variant:racine.getChildren()) {
+            if(!plugins.containsKey(variant.getName())){
                 throw new NoSuchFieldException("The featureModel call a plugin called \""+variant.getName()+"\" but no plugin with that name is registred");
             }
             else if(!plugins.get(variant.getName()).checConstruct(variant)){
                 throw new StructureNotSupportedException("the variant \""+variant.getName()+"\" with the name \""+
                 variant.getAttributeValue("name")+"\" has an unsupported structure.");
             }
+        }*/
+        for (Element variant:racine.getChildren()) {
+            if(!plugins.containsKey(variant.getName())){
+                throw new NoSuchFieldException("The featureModel call a plugin called \""+variant.getName()+"\" but no plugin with that name is registred");
+            }
+            JavaFileManager.getInstance().buildXSDFile(plugins.get(variant.getName()).getxsdDeclaration(),xsdFile);
         }
+        JavaFileManager.getInstance().applyXSD(xsdFile, featureModelPath);
+        new File(xsdFile).delete();
     }
 
     /**
@@ -119,7 +130,7 @@ public class main_engine {
      * @return Map<String, interpreter> plugin's name and the plugin
      */
     static public Map<String, Interpreter> loadPlugins(){
-        PluginLoader pluginLoader = new PluginLoader();
+        /*PluginLoader pluginLoader = new PluginLoader();
         Map<String, Interpreter>pluginsList = new HashMap<>();
         try {
             for (Interpreter plugin:pluginLoader.loadAllPlugins()) {
@@ -128,12 +139,12 @@ public class main_engine {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return pluginsList;
-        /*ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
+        return pluginsList;*/
+        ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
         Map<String, Interpreter> services = new HashMap<>();
         for (Interpreter service : serviceLoader) {
             services.put(service.getName(), service);
         }
-        return services;*/
+        return services;
     }
 }

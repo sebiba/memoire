@@ -1,0 +1,22 @@
+<xs:element name="SpringPreprocessor">
+<xs:complexType>
+<xs:sequence minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="file">
+    <xs:complexType>
+        <xs:attribute name="path" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="var">
+    <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+           <xs:anyAttribute processContents="lax"/>
+          </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    </xs:element>
+</xs:sequence>
+<xs:attribute name="name" type="xs:string" use="required"/>
+<xs:attribute name="require" type="xs:string"/>
+</xs:complexType>
+</xs:element>

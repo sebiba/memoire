@@ -1,6 +1,6 @@
 package plugin;
 
-import Interpreter;
+import interfaces.Interpreter;
 import com.google.auto.service.AutoService;
 import lib.Importer;
 import lib.JavaFileManager;
@@ -8,6 +8,9 @@ import org.jdom2.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,13 +26,8 @@ public class SpringAspect implements Interpreter {
         return "SpringAspect";
     }
     @Override
-    public boolean checConstruct(Element node) {
-        for (Element child:node.getChildren()) {
-            if(Objects.equals(child.getName(), "file")){
-                return !child.getAttributeValue("path").isEmpty();
-            }
-        }
-        return false;
+    public String getxsdDeclaration() throws IOException {
+        return Files.readString(Path.of("src/main/resources/SpringAspect.xsd.txt"), StandardCharsets.UTF_8);
     }
     @Override
     public void checImport(String localDirect, Map<String, String> importer, String file) throws IOException {

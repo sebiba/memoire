@@ -1,0 +1,13 @@
+<xs:element name="SpringAspect">
+<xs:complexType>
+<xs:sequence minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="file">
+    <xs:complexType>
+        <xs:attribute name="path" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+</xs:sequence>
+<xs:attribute name="name" type="xs:string" use="required"/>
+<xs:attribute name="require" type="xs:string"/>
+</xs:complexType>
+</xs:element>
