@@ -43,6 +43,7 @@ public class SpringPreprocessor implements Interpreter {
                     for (Element variable:varList) {
                         variable.getAttributes().forEach(a->fileVar.put(a.getName(), a.getValue()));
                     }
+                    lines = this.defineHandler(fileVar, lines);
                     int lineStart;
                     while(true) {
                         int lineIf=0;
@@ -68,6 +69,24 @@ public class SpringPreprocessor implements Interpreter {
             }
         }
     }
+
+    private List<String> defineHandler(Map<String, String> fileVar, List<String> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            if(lines.get(i).contains(this.detector) && lines.get(i).contains("define")){
+                String var = lines.get(i);
+                var = var.replace(this.detector,"");
+                var = var.replace("define","");
+                int cpt = 0;
+                for (String line: lines) {
+                    lines.set(cpt, line.replace(var.trim().split("\\s+")[0], var.trim().substring(var.trim().indexOf(' ')+1)));
+                    cpt++;
+                }
+                lines.remove(i);
+            }
+        }
+        return lines;
+    }
+
     @Override
     public void setConfigFile(Element node){
         for (Element var:node.getChildren()) {
