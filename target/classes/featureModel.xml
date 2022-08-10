@@ -4,8 +4,10 @@
         <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
     </SpringAspect>
     <SpringPreprocessor name="SGBD">
-        <file path="\src\main\resources\application.properties" />
-        <var datasource="mysql" />
+        <file path="\src\main\resources\application.properties">
+            <var datasource="mysql" />
+            <var TEST="true" />
+        </file>
     </SpringPreprocessor>
     <Delta name="liker" require="compte">
         <modif>
@@ -57,6 +59,14 @@
             <file path="src/main/java/com/example/testspring/Model/User.java" />
             <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
         </addFile>
+        <modif>
+            <file type="java" path="src/main/java/com/example/testspring/Model/Product.java">
+                <add>
+                    @ManyToMany
+                    private Set&lt;User&gt; likers;
+                </add>
+            </file>
+        </modif>
     </Delta>
     <Plugin name="recherche">
         <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
