@@ -4,9 +4,10 @@
         <file path="\src\main\java\com\example\testspring\dbAccess\DBManagerAspect.java" />
     </SpringAspect>
     <SpringPreprocessor name="SGBD">
-        <file path="\src\main\resources\application.properties" />
-        <var datasource="mysql" />
-        <var test="true"/>
+        <file path="\src\main\resources\application.properties">
+            <var datasource="mysql" />
+            <var TEST="true" />
+        </file>
     </SpringPreprocessor>
     <Delta name="liker" require="compte">
         <modif>

@@ -1,7 +1,6 @@
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
 import lib.Importer;
-import interfaces.Interpreter;
 import lib.JavaFileManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -145,7 +144,7 @@ public class main_engine {
      * @return Map<String, interpreter> plugin's name and the plugin
      */
     static public Map<String, Interpreter> loadPlugins(){
-        /*PluginLoader pluginLoader = new PluginLoader();
+        PluginLoader pluginLoader = new PluginLoader();
         Map<String, Interpreter>pluginsList = new HashMap<>();
         try {
             for (Interpreter plugin:pluginLoader.loadAllPlugins()) {
@@ -154,12 +153,12 @@ public class main_engine {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return pluginsList;*/
-        ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
+        return pluginsList;
+        /*ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
         Map<String, Interpreter> services = new HashMap<>();
         for (Interpreter service : serviceLoader) {
             services.put(service.getName(), service);
         }
-        return services;
+        return services;*/
     }
 }
