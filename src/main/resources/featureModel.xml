@@ -6,6 +6,7 @@
     <SpringPreprocessor name="SGBD">
         <file path="\src\main\resources\application.properties" />
         <var datasource="mysql" />
+        <var test="true"/>
     </SpringPreprocessor>
     <Delta name="liker" require="compte">
         <modif>

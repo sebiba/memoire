@@ -4,6 +4,7 @@
     <SpringAspect name="logging"/>
     <SpringPreprocessor name="SGBD">
         <var datasource="mysql" />
+        <var TEST="false" />
     </SpringPreprocessor>
     <Delta name="liker" />
     <Delta name="compte" />

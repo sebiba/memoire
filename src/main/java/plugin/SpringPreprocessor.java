@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @AutoService(Interpreter.class)
@@ -43,7 +44,7 @@ public class SpringPreprocessor implements Interpreter {
                     for (Element variable:varList) {
                         variable.getAttributes().forEach(a->fileVar.put(a.getName(), a.getValue()));
                     }
-                    lines = this.defineHandler(fileVar, lines);
+                    lines = this.defineHandler(lines);
                     int lineStart;
                     while(true) {
                         int lineIf=0;
@@ -70,12 +71,18 @@ public class SpringPreprocessor implements Interpreter {
         }
     }
 
-    private List<String> defineHandler(Map<String, String> fileVar, List<String> lines) {
+    private List<String> defineHandler(List<String> lines) {
         for (int i = 0; i < lines.size(); i++) {
             if(lines.get(i).contains(this.detector) && lines.get(i).contains("define")){
                 String var = lines.get(i);
                 var = var.replace(this.detector,"");
                 var = var.replace("define","");
+                if(this.configVar.keySet().stream().anyMatch(var::contains)){
+                    String old = this.configVar.keySet().stream().filter(var::contains).collect(Collectors.toList()).get(0);
+                    String replace = this.configVar.get(old);
+                    var.trim().split("\\s+");
+                    var = var.trim().split("\\s+")[0]+" "+replace;
+                }
                 int cpt = 0;
                 for (String line: lines) {
                     lines.set(cpt, line.replace(var.trim().split("\\s+")[0], var.trim().substring(var.trim().indexOf(' ')+1)));
