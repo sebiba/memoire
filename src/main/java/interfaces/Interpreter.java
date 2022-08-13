@@ -13,9 +13,9 @@ public interface Interpreter {
     String getName();
 
     /**
-     * check is the structure of the featureModel is correct
-     *
-     * @return true if the featureModel's structure is correct false otherwise
+     * get the XSD for validate the part of the featureModel that concerne this plugin
+     * @return String XSD for thee featureModel of this plugin
+     * @throws IOException Error while accessing plugin's XSD file
      */
     String getxsdDeclaration() throws IOException;
 

@@ -140,6 +140,11 @@ public class Importer {
                     requires.add(this.isVariantSelected(racine, variant.getAttributeValue("require")));
                 }
             }
+            if(variant.getAttributeValue("denied") != null){
+                if(configVariant.contains(variant.getAttributeValue("denied"))){
+                    return false;
+                }
+            }
         }
         return !requires.contains(false);
     }
