@@ -1,12 +1,12 @@
 import exceptions.RequirementException;
 import exceptions.StructureNotSupportedException;
+import lib.CompileManager;
 import lib.Importer;
 import lib.JavaFileManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
-import interfaces.Interpreter;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,13 +97,13 @@ public class main_engine {
             }
         }
         System.out.println("configuration assemblée");
-        //CompileManager.getInstance().maven_powerShell("temp", "compile");
+        CompileManager.getInstance().maven_powerShell("temp", "compile");
         System.out.println("compilation effectuée");
-        /*if(withoutTest){
+        if(withoutTest){
             CompileManager.getInstance().maven_powerShell("temp", "package -DskipTests");
         }else{
             CompileManager.getInstance().maven_powerShell("temp", "package");
-        }*/
+        }
         System.out.println("packagation effectuée");
     }
     public static void checFeatureModel(Element racine, String featureModelPath) throws StructureNotSupportedException, NoSuchFieldException, IOException, SAXException {
@@ -145,7 +145,7 @@ public class main_engine {
      * @return Map<String, interpreter> plugin's name and the plugin
      */
     static public Map<String, Interpreter> loadPlugins(){
-        /*PluginLoader pluginLoader = new PluginLoader();
+        PluginLoader pluginLoader = new PluginLoader();
         Map<String, Interpreter>pluginsList = new HashMap<>();
         try {
             for (Interpreter plugin:pluginLoader.loadAllPlugins()) {
@@ -154,12 +154,12 @@ public class main_engine {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return pluginsList;*/
-        ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
+        return pluginsList;
+        /*ServiceLoader<Interpreter> serviceLoader = ServiceLoader.load(Interpreter.class);
         Map<String, Interpreter> services = new HashMap<>();
         for (Interpreter service : serviceLoader) {
             services.put(service.getName(), service);
         }
-        return services;
+        return services;*/
     }
 }

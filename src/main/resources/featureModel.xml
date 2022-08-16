@@ -69,8 +69,6 @@
         </modif>
     </Delta>
     <Plugin name="recherche">
-        <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
-        <file path="src/main/java/com/example/testspring/Interface/PluginInterface.java" />
-        <file path="src/main/resources/static/rechercheNavBar.html" />
+        <file path="plugins/recherche.jar" />
     </Plugin>
 </FeatureModel>
