@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <import uri="C:\unamur\Master\memoire\SPL\main\featureModel.xml"/>
-    <SpringAspect name="logging"/>
     <SpringPreprocessor name="SGBD">
         <var datasource="mysql" />
-        <var TEST="false" />
     </SpringPreprocessor>
-    <Delta name="liker" />
-    <Delta name="compte" />
-    <Plugin name="recherche" />
 </Configuration>

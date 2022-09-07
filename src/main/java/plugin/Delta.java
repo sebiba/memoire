@@ -141,14 +141,19 @@ public class Delta implements Interpreter {
         //loop from EOF to catch Class end
         /*assomption file end with 1 class end*/
         for (Element add:addFile.getChildren()) {
-            if(!addFile.getChildren().get(0).getText().contains("{")){
+            if(addFile.getChildren().get(0).getText().contains("import ")){
+                fileContent.add(1, add.getText());
+                break;
+            }
+            else if(!addFile.getChildren().get(0).getText().contains("{")){
                 for (int i = 0; i < fileContent.size() ; i++){
                     if(fileContent.get(i).contains("class")){
                         fileContent.add(i+1, add.getText());
                         break;
                     }
                 }
-            }else{
+            }
+            else{
                 for (int i = fileContent.size()-1; i > 0; i--) {
                     if(fileContent.get(i).contains("}") && !fileContent.get(i).contains("//")){
                         if(add.getName().equals("add")){

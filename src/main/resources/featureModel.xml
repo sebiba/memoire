@@ -33,6 +33,12 @@
                     }
                 </add>
             </file>
+            <file type="java" path="src/main/java/com/example/testspring/Controler/ShopControler.java">
+                <add>
+                    import com.example.testspring.Model.User;
+                    import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+                </add>
+            </file>
             <file type="java" path="src/main/java/com/example/testspring/dbAccess/DBManager.java">
                 <add>
                     public User findUserByName(String name){
@@ -43,7 +49,23 @@
                     }
                 </add>
             </file>
+            <file type="java" path="src/main/java/com/example/testspring/dbAccess/DBManager.java">
+                <add>
+                    import com.example.testspring.Model.User;
+                    import com.example.testspring.Model.UserRepository;
+                </add>
+            </file>
+            <file type="java" path="src/main/java/com/example/testspring/dbAccess/DBManager.java">
+                <add>
+                    @Autowired
+                    private UserRepository userRepository;
+                </add>
+            </file>
             <file type="html" path="src/main/resources/templates/bibliotheque.html">
+                <p>
+                    <span>Nombre de like: </span>
+                    <span th:text="${productDetail.likers.size()}"></span>
+                </p>
                 <add endOf="detail">
                     <form id="likerForm" action="#" th:action="@{/bib/like}" method="post">
                         <input type="hidden" name="ean" th:value="${productDetail.ean}"/>
@@ -53,22 +75,22 @@
                 </add>
             </file>
         </modif>
+        <deleteFile>
+            <file type="java" path="src/main/java/com/example/testspring/Model/Product.java" />
+        </deleteFile>
+        <addFile>
+            <file type="java" path="src/main/java/com/example/testspring/Model/Product.java" />
+        </addFile>
     </Delta>
     <Delta name="compte">
         <addFile>
             <file path="src/main/java/com/example/testspring/Model/User.java" />
             <file path="src/main/java/com/example/testspring/Model/UserRepository.java" />
         </addFile>
-        <modif>
-            <file type="java" path="src/main/java/com/example/testspring/Model/Product.java">
-                <add>
-                    @ManyToMany
-                    private Set&lt;User&gt; likers;
-                </add>
-            </file>
-        </modif>
     </Delta>
     <Plugin name="recherche">
-        <file path="plugins/recherche.jar" />
+        <file path="src/main/java/com/example/testspring/Plugin/Recherche.java" />
+        <file path="src/main/java/com/example/testspring/Interface/PluginInterface.java" />
+        <file path="src/main/resources/static/rechercheNavBar.html" />
     </Plugin>
 </FeatureModel>
