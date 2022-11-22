@@ -158,6 +158,7 @@ public class Importer {
     private Boolean isVariantSelected(Element racine, String require) {
         for (Element variant:racine.getChildren()) {
             if(!variant.getName().equals("import")){
+                //TODO: add exception for variant.getAttributeValue("name") is null ==> not name attribute
                 if(variant.getAttributeValue("name").equals(require)){
                     return true;
                 }
