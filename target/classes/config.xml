@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <import uri="C:\unamur\Master\memoire\SPL\main\featureModel.xml"/>
-    <SpringAspect names="logging"/>
+    <SpringAspect name="logging"/>
     <SpringPreprocessor name="SGBD">
         <var datasource="mysql" />
     </SpringPreprocessor>

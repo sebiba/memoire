@@ -129,7 +129,7 @@ public class Importer {
      * @throws IOException error while opening featureModel's file
      * @throws JDOMException error while parsing XML from featureModel
      */
-    public boolean checSelection(Element racine) throws IOException, JDOMException {
+    public boolean checSelection(Element racine) throws IOException, JDOMException, RequirementException {
         List<Boolean> requires = new ArrayList<>();
         Document featureModel = JavaFileManager.getInstance().getXmlFile(localImport);
         List<String> configVariant = racine.getChildren().stream().map(v->v.getAttributeValue("name")).collect(Collectors.toList());
@@ -155,12 +155,17 @@ public class Importer {
      * @param require String name of the variant to check
      * @return true if require variant is selected false otherwise
      */
-    private Boolean isVariantSelected(Element racine, String require) {
+    private Boolean isVariantSelected(Element racine, String require) throws RequirementException {
         for (Element variant:racine.getChildren()) {
             if(!variant.getName().equals("import")){
                 //TODO: add exception for variant.getAttributeValue("name") is null ==> not name attribute
-                if(variant.getAttributeValue("name").equals(require)){
-                    return true;
+                try {
+                    if (variant.getAttributeValue("name").equals(require)) {
+                        return true;
+                    }
+                }catch (NullPointerException ex){
+                    throw new RequirementException("un des élément présent dans le fichier de configuration ne " +
+                        "possède pas d'attribute name");
                 }
             }
         }

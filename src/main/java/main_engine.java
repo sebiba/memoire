@@ -99,7 +99,7 @@ public class main_engine {
     }
     public static void variantAdder(Element configRacine, Importer importer, List<String> gitBranches) throws StructureNotSupportedException, IOException, JDOMException {
         Map<String, Interpreter> pluginsList = loadPlugins();
-        if(pluginsList.size() == 0){
+        if(pluginsList.isEmpty()){
             System.out.println("Aucun plugins a pu être chargé");
             return;
         }
@@ -116,7 +116,7 @@ public class main_engine {
                         throw new StructureNotSupportedException("The branches '"+node.getAttributeValue("name")+"' has not been found on github");
                     }
                 }
-                if(configRacine.getName().equals("Configuration") && node.getChildren().size()>0){
+                if(configRacine.getName().equals("Configuration") && !node.getChildren().isEmpty()){
                     pluginsList.get(node.getName()).setConfigFile(node);
                 }
                 pluginsList.get(node.getName()).construct(importer.getFeatureModelFor(node.getAttribute("name").getValue()),
